@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Detalhes do Paciente</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+
+    .container {
+      margin: 45px;
+      padding: 10px;
+      padding-top: 30px;
+      background-color: #f2f2f2;
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      padding-left: 30px;
+      max-width: 2320px;
+    }
+
+
+    .patient-info {
+      flex: 0 0 40%;
+      /* Ocupa 40% da largura horizontalmente */
+      margin-right: 20px;
+    }
+
+    .movement {
+      flex: 1;
+    }
+
+    span {
+      color: black;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 0 0 10px;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+
+    .session-info {
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      width: fit-content;
+      box-sizing: border-box;
+      /* Inclui o padding na largura total do elemento */
+      display: inline-block;
+      border: 1px solid #000;
+      /* Adicione uma borda sólida de 1px com a cor #ccc */
+      border-radius: 5px;
+      /* Arredonde as bordas com um raio de 5px */
+      align-items: center;
+      /* Centralize verticalmente o conteúdo */
+    }
+
+
+    .session-heading {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      position: relative;
+      /* Adiciona posicionamento relativo */
+    }
+
+    .session-heading::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      /* Posiciona a linha abaixo do texto */
+      left: 0;
+      right: 0;
+      height: 1px;
+      /* Define a altura da linha */
+      background-color: #000;
+      /* Define a cor da linha */
+      margin: 0 auto;
+      /* Centraliza a linha horizontalmente */
+    }
+
+    .session-heading span {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+
+
+    .session-1 {
+      background-color: #D6E9FF;
+      color: white;
+    }
+
+    .session-2 {
+      background-color: #66B3FF;
+      color: white;
+    }
+
+    .session-3 {
+      background-color: #B3FFCC;
+      color: white;
+    }
+
+    .session-4 {
+      background-color: #33FF77;
+      color: white;
+    }
+
+    .session-5 {
+      background-color: #FFFF99;
+      color: white;
+    }
+
+    .session-6 {
+      background-color: #FFFF33;
+      color: white;
+    }
+
+    .session-7 {
+      background-color: #FFCC99;
+      color: white;
+    }
+
+    .session-8 {
+      background-color: #FF9933;
+      color: white;
+    }
+
+    .session-9 {
+      background-color: #FF9999;
+      color: white;
+    }
+
+    .session-10 {
+      background-color: #FF3333;
+      color: white;
+    }
+
+    .session-leve {
+      background-color: #5cb85c;
+      color: white;
+    }
+
+    .session-moderado {
+      background-color: #f0ad4e;
+      color: white;
+    }
+
+    .session-severo {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .movement-list {
+      list-style-type: none;
+      padding: 0;
+      display: none;
+      margin: 0 20px 0 0
+    }
+
+    .movement-list-item {
+      margin-bottom: 5px;
+      color: black;
+    }
+
+    #pain-chart {
+      width: 100%;
+      height: 300px;
+    }
+
+    #movement-chart {
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .selected {
+      fill: #66FF99;
+    }
+
+    .patient-container {
+      display: flex;
+    }
+
+    .card {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .patient-info.card {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      margin-right: 20px;
+      flex: 0 0 30%;
+      /* Reduza a largura horizontalmente */
+      /*max-height: 400px;*/
+      /* Ajuste a altura máxima */
+      overflow: auto;
+      height: 420px;
+      font-size: xx-large;
+    }
+
+    #corpo {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    #corpo h2 {
+      margin-top: 0;
+      margin-bottom: -15px;
+    }
+
+    .arrow-icon {
+      font-size: 0.8em;
+      vertical-align: middle;
+      transition: transform 0.3s ease;
+    }
+
+    .expanded .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    .arrow-icon.selected2 {
+      color: red;
+      /* Substitua 'red' pela cor desejada */
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .chart-container {
+      flex-grow: 1;
+      /*width: 400px;*/
+      padding-right: 20px;
+    }
+
+    .info-card {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    svg {
+      display: block;
+    }
+
+    .satisfaction-icon {
+      color: #555555;
+    }
+
+    .add-patient {
+      color: green;
+
+    }
+
+    .satisfaction-icon--high {
+      color: green;
+    }
+
+    .satisfaction-icon--medium {
+      color: orange;
+    }
+
+    .satisfaction-icon--low {
+      color: red;
+    }
+
+    .edit-container {
+      position: relative;
+    }
+
+    .edit-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .edit-actions {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      display: none;
+    }
+
+    .action-button {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      font-size: 18px;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    .action-button i {
+      margin-right: 6px;
+    }
+
+    #confirmation-dialog {
+      display: none;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .display-field {
+      font-size: xx-large;
+    }
+
+    .edit-field {
+      font-size: xx-large;
+
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: -10px;
+      height: 50px;
+      background-color: #333;
+      color: #fff;
+    }
+
+    .back-button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .close-button-wrapper {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .close-button {
+      color: red;
+      font-size: 18px;
+      cursor: pointer;
+      position: relative;
+      top: 0;
+      right: 3;
+      left: 10;
+      margin-left: 30px;
+      border-radius: 2px 2px 2px;
+      border: 1px solid #000;
+    }
+
+    .edit-mode .close-button {
+      display: block;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+</head>
+
+<body>
+  <header>
+    <button class="back-button" onclick="goBack()">Voltar</button>
+
+    <h1 style="text-align: center;">Painel Do paciente</h1>
+  </header>
+
+  <div class="container">
+    <div class="chart-container">
+      <div class="patient-info card" style="min-width: 500px;max-width: 500px;height: 460px;">
+        <h1 style="text-align: center; font-size: xx-large;">Detalhes</h1>
+        <div class="detail-row edit-container">
+          <span class="label"><i class="fas fa-user info-icon"></i>&nbsp&nbsp Nome: </span>
+          <input type="text" id="patient-name-edit" class="edit-field hide ">
+          <span id="patient-name" class="display-field"></span>
+          <i class="fas fa-edit edit-icon" onclick="showEditableFields()"></i>
+        </div>
+        <div class="edit-actions hide">
+          <button class="action-button save-button" onclick="showConfirmationDialog('save')"><i class="fas fa-save"></i>
+            Salvar</button>
+          <button class="action-button cancel-button" onclick="showConfirmationDialog('cancel')"><i
+              class="fas fa-times"></i> Cancelar</button>
+          <button class="action-button delete-button" onclick="showConfirmationDialog('delete')"><i
+              class="fas fa-trash"></i> Excluir</button>
+        </div>
+
+        <!-- Campos editáveis -->
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-calendar-alt info-icon"></i>&nbsp&nbsp Idade: </span>
+          <input type="text" id="patient-age-edit" class="edit-field hide " disabled>
+          <span id="patient-age" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-venus-mars info-icon"></i>&nbsp Gênero: </span>
+          <input type="text" id="patient-gender-edit" class="edit-field hide " disabled>
+          <span id="patient-gender" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-hospital info-icon"></i>&nbsp&nbsp Clínica: </span>
+          <input type="text" id="patient-clinic-edit" class="edit-field hide " disabled>
+          <span id="patient-clinic" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-heartbeat info-icon"></i>&nbsp Sintomas: </span>
+          <input type="text" id="patient-symptoms-edit" class="edit-field hide" disabled>
+          <span id="patient-symptoms" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-thermometer-half info-icon"></i>&nbsp&nbsp&nbsp Nível de dor:</span>
+          <input type="text" id="patient-pain-level-edit" class="edit-field hide " disabled>
+          <span id="patient-pain-level" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-clock info-icon"></i>&nbsp Tempo de Reabilitação:</span>
+          <input type="text" id="patient-rehab-time-edit" class="edit-field hide " disabled>
+          <span id="patient-rehab-time" class="display-field"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-list info-icon"></i>&nbsp Número de sessões:</span>
+          <input type="text" id="patient-session-count-edit" class="edit-field hide " disabled>
+          <span id="patient-session-count" class="display-field"></span>
+        </div>
+        <div class="detail-row" id="avg-satisfaction-info">
+          <span class="label"><i class="fas fa-smile info-icon"> </i>&nbsp Satisfação:</span>
+          <input type="text" id="patient-satisfaction-edit" class="edit-field hide " disabled>
+          <span id="patient-satisfaction" class="display-field"></span>
+        </div>
+      </div>
+
+    </div>
+    <div class="chart-container">
+      <div class="info-card">
+        <div class="movement card" style="width: 600px;">
+          <h2 style="text-align:center; font-size: xx-large;">Movimentos realizados</h2>
+          <div id="movement-chart" style="height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="info-card">
+        <div class="card">
+          <h2 style="text-align:center; font-size: xx-large;">Progressão da Dor</h2>
+          <div id="pain-chart" style="height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="info-card">
+        <div class="notes-card" style="flex: 1;align-items: center;max-width: 500px;height: 415px;">
+          <h2 style="text-align: center; font-size: xx-large;">Anotações</h2>
+          <textarea id="notes" rows="5" style="max-width: 350px;max-height: 250px;  min-height: 305px;min-width: 350px;font-size: xx-large;  resize: none;
+          " disabled></textarea>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="chart-container" style="width: auto;">
+      <div class="card" style="padding: 10px;">
+        <h2 id="sessoes" onclick="toggleExpansion()">
+          Sessões
+          <i class="fas fa-chevron-down arrow-icon"></i>
+        </h2>
+        <div id="session-list">
+          <div id="corpo" style="margin-left: auto; float: right;">
+            <h2 style="margin-bottom: -15px;">Filtro das juntas</h2>
+          </div>
+        </div>
+        <button id="add-session-button" class="action-button hide" onclick="selectFile()">
+          <i class="fas fa-plus"></i>
+        </button>
+        <input type="file" id="file-input" style="display: none;" multiple>
+        <div id="pain-level-inputs" class="hide"></div>
+        <button id="add-button" class="action-button hide">Adicionar</button>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  <script>
+
+    function goBack() {
+      window.history.back();
+    }
+
+    function showSuccessPopup() {
+      Swal.fire({
+        title: "Sucesso ao atualizar o paciente",
+        icon: "success",
+        confirmButtonText: "OK",
+        timer: 3000, // Tempo em milissegundos (3 segundos)
+        timerProgressBar: true, // Mostra uma barra de progresso durante o temporizador
+        allowOutsideClick: false, // Impede o usuário de clicar fora do modal
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
+
+    }
+
+    // Função para exibir o pop-up de erro
+    function showErrorPopup() {
+      Swal.fire({
+        title: "Erro ao atualizar o paciente",
+        icon: "warning",
+        confirmButtonText: "OK",
+        timer: 3000, // Tempo em milissegundos (3 segundos)
+        timerProgressBar: true, // Mostra uma barra de progresso durante o temporizador
+        allowOutsideClick: false, // Impede o usuário de clicar fora do modal
+      })
+    }
+
+    function showEditableFields() {
+      const displayFields = document.querySelectorAll('.display-field');
+      const editFields = document.querySelectorAll('.edit-field');
+      const editActions = document.querySelector('.edit-actions');
+      const closeButton = document.querySelectorAll('.close-button');
+      console.log(closeButton)
+      closeButton.forEach(
+        (button, index) => {
+          button.style.display = 'block';
+
+        });
+
+
+      console.log(displayFields)
+      console.log(editFields)
+      displayFields.forEach((displayField, index) => {
+        const editField = editFields[index];
+        displayField.style.display = 'none';
+        editField.style.display = 'inline-block';
+        editField.disabled = false;
+        editField.value = displayField.textContent;
+
+      });
+      document.getElementById("notes").disabled = false;
+      document.getElementById("patient-session-count-edit").disabled = true;
+      document.getElementById("patient-pain-level-edit").disabled = true;
+
+      // Exibe os botões de ação
+      editActions.style.display = 'block';
+
+      // Oculta o botão de edição
+      const editIcon = document.querySelector('.edit-icon');
+      editIcon.style.display = 'none';
+      document.getElementById("add-session-button").classList.remove("hide");
+
+
+    }
+
+    function showActionButtons() {
+      const editIcons = document.querySelectorAll('.edit-icon');
+      const actionButtons = document.querySelector('.edit-actions');
+
+      for (let i = 0; i < editIcons.length; i++) {
+        editIcons[i].style.display = 'none';
+      }
+
+      actionButtons.style.display = 'flex';
+
+      // Obter o valor atual do campo de visualização e preenchê-lo no campo de edição
+
+    }
+
+    function confirmAction() {
+
+      paciente.name = document.getElementById('patient-name-edit').value;
+      paciente.age = parseInt(document.getElementById('patient-age-edit').value);
+      paciente.gender = document.getElementById('patient-gender-edit').value;
+      paciente.clinic = document.getElementById('patient-clinic-edit').value;
+      //paciente.pain- =  document.getElementById('patient-pain-level').textContent;
+
+      paciente.rehabTime = parseInt(document.getElementById('patient-rehab-time-edit').value);
+
+      paciente.satisfaction = parseInt(document.getElementById('patient-satisfaction-edit').value);
+      paciente.symptoms = document.getElementById('patient-symptoms-edit').value;
+      paciente.notes = document.getElementById('notes').value;
+      paciente.sessions = sessoes_backup;
+      let sessions2 = paciente.sessions;
+      let ind = 0;
+      for (let sessionIndex in sessions2) {
+        let session = sessions2[sessionIndex];
+        console.log(ind, ind + 1)
+
+        session.sessionNumber = ind + 1;
+        ind++;
+      }
+      paciente.sessions = sessions2;
+      console.log(paciente)     // paciente.name =  document.getElementById('patient-session-count').textContent;
+      // Opções da requisição
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paciente),
+      };
+
+      // Fazendo a requisição POST para a rota de atualização
+      fetch('/atualizar-paciente', options)
+        .then(response => {
+          if (response.ok) {
+            localStorage.setItem('patientData', JSON.stringify(paciente._id));
+            console.log('Paciente atualizado com sucesso');
+
+            const displayFields = document.querySelectorAll('.display-field');
+            const editFields = document.querySelectorAll('.edit-field');
+            const editActions = document.querySelector('.edit-actions');
+            displayFields.forEach((displayField, index) => {
+              const editField = editFields[index];
+              displayField.style.display = 'inline-block';
+              editField.style.display = 'none';
+              editField.disabled = true;
+              displayField.textContent = editField.value;
+              displayField.classList.remove('hide');
+              editField.classList.add('hide');
+            });
+            document.getElementById("notes").disabled = true;
+            const closeButton = document.querySelectorAll('.close-button');
+            closeButton.forEach(
+              (button, index) => {
+                button.style.display = 'none';
+
+              });
+            // Ocultar os botões de ação e mostrar o botão de edição novamente
+            const editIcon = document.querySelector('.edit-icon');
+            const actionButtons = document.querySelector('.edit-actions');
+
+            editIcon.style.display = 'block';
+            actionButtons.style.display = 'none';
+            document.getElementById("add-session-button").classList.add("hide");
+            document.getElementById("add-session-button").classList.add("hide");
+            document.getElementById("add-button").style.display = 'none';
+            document.getElementById("pain-level-inputs").classList.add("hide");
+            showSuccessPopup();
+
+          } else {
+            console.log('Falha ao atualizar o paciente');
+            showErrorPopup();
+
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao realizar a requisição:', error);
+        });
+    }
+
+    function hideConfirmationDialog() {
+      const editIcon = document.querySelector('.edit-icon');
+      const actionButtons = document.querySelector('.edit-actions');
+
+      editIcon.style.display = 'block';
+      actionButtons.style.display = 'none';
+    }
+
+
+    function showConfirmationDialog(action) {
+      if (action == 'save') {
+        Swal.fire({
+          title: "Deseja realmente alterar as informações?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancelar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            confirmAction(action);
+          }
+        });
+      }
+      if (action == 'cancel') {
+        Swal.fire({
+          title: "Deseja realmente cancelar as alterações?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancelar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const displayFields = document.querySelectorAll('.display-field');
+            const editFields = document.querySelectorAll('.edit-field');
+            const editActions = document.querySelector('.edit-actions');
+            displayFields.forEach((displayField, index) => {
+              const editField = editFields[index];
+              displayField.style.display = 'inline-block';
+              editField.style.display = 'none';
+              editField.disabled = true;
+              displayField.classList.remove('hide');
+              editField.classList.add('hide');
+            });
+            paciente.sessions = sessoes_backup;
+            // Ocultar os botões de ação e mostrar o botão de edição novamente
+            const editIcon = document.querySelector('.edit-icon');
+            const actionButtons = document.querySelector('.edit-actions');
+            document.getElementById("notes").disabled = true;
+            const closeButton = document.querySelectorAll('.close-button');
+            closeButton.forEach(
+              (button, index) => {
+                button.style.display = 'none';
+              });
+            editIcon.style.display = 'block';
+            actionButtons.style.display = 'none';
+            document.getElementById("add-session-button").classList.add("hide");
+            document.getElementById("add-button").style.display = 'none';
+            document.getElementById("pain-level-inputs").classList.add("hide");
+            Swal.fire({
+              title: "Alterações canceladas",
+              icon: "warning",
+              confirmButtonText: "OK",
+            })
+            window.location.reload();
+
+          }
+        });
+      }
+      if (action == 'delete') {
+        Swal.fire({
+          title: "Deseja realmente deseja deletar o paciente? ",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sim",
+          cancelButtonText: "Não"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            excluir();
+
+          }
+        });
+      }
+
+    }
+
+
+
+    function toggleExpansion() {
+      let element = document.getElementById("sessoes");
+      console.log(element)
+      element.classList.toggle('expanded');
+      const arrowIcon = element.querySelector('.arrow-icon');
+      arrowIcon.classList.toggle('fa-rotate-180');
+      arrowIcon.classList.toggle('selected2'); // Adiciona ou remove a classe 'selected'
+
+    }
+
+    function excluir() {
+      let pacienteId = JSON.parse(localStorage.getItem('patientData'));
+
+      fetch(`/deletar-paciente/${pacienteId}`, {
+        method: 'DELETE',
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log('Paciente removido com sucesso');
+            Swal.fire({
+              title: "Sucesso ao remover o paciente",
+              icon: "success",
+              confirmButtonText: "OK",
+              timer: 3000, // Tempo em milissegundos (3 segundos)
+              timerProgressBar: true, // Mostra uma barra de progresso durante o temporizador
+              allowOutsideClick: false, // Impede o usuário de clicar fora do modal
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = `index.html`;
+              }
+            });
+
+            // Faça qualquer ação adicional necessária após a remoção do paciente
+          } else {
+            console.log('Erro ao remover o paciente');
+            // Trate o erro de remoção do paciente adequadamente
+          }
+        })
+        .catch((error) => {
+          console.log('Erro de conexão:', error);
+          // Trate os erros de conexão adequadamente
+        });
+    }
+  </script>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+  <script>
+
+    const painLevelTexts = {
+      10: "Insuportável",
+      9: "Muito extrema",
+      8: "Extrema",
+      7: "Muito forte",
+      6: "Muito intensa",
+      5: "Intensa",
+      4: "Considerável",
+      3: "Moderada",
+      2: "Leve",
+      1: "Muito leve",
+      0: "Nenhuma"
+    };
+
+    let pacienteId = JSON.parse(localStorage.getItem('patientData'));
+    let sessoes_backup;
+    console.log(pacienteId)
+    let paciente;
+    fetch(`/pacientes/${pacienteId}`)
+      .then(response => response.json())
+      .then(data => {
+        // Aqui você pode fazer algo com o paciente retornado, como exibir os dados na página
+        console.log(data);
+        paciente = data;
+        sessoes_backup = data.sessions;
+        document.getElementById('patient-name').textContent = data.name;
+        document.getElementById('patient-age').textContent = data.age;
+        document.getElementById('patient-gender').textContent = data.gender;
+        document.getElementById('patient-clinic').textContent = data.clinic;
+        document.getElementById('patient-pain-level').textContent = painLevelTexts[data.painLevel];
+
+        document.getElementById('patient-rehab-time').textContent = data.rehabTime;
+
+        document.getElementById('patient-satisfaction').textContent = data.satisfaction;
+
+        document.getElementById('patient-session-count').textContent = data.numSessoes;
+        document.getElementById('patient-symptoms').textContent = data.symptoms;
+
+        const container = document.querySelector('.container');
+        let cor;
+
+        switch (data.painLevel) {
+          case 10:
+            cor = '#FF3333';
+            break;
+          case 9:
+            cor = '#FF9999';
+            break;
+          case 8:
+            cor = '#FF9933';
+            break;
+          case 7:
+            cor = '#FFCC99';
+            break;
+          case 6:
+            cor = '#FFFF33';
+            break;
+          case 5:
+            cor = '#FFFF99';
+            break;
+          case 4:
+            cor = '#33FF77';
+            break;
+          case 3:
+            cor = '#B3FFCC';
+            break;
+          case 2:
+            cor = '#66B3FF';
+            break;
+          case 1:
+            cor = '#D6E9FF';
+            break;
+          case 0:
+            cor = '#cbe1fc'
+            break;
+          default:
+            cor = '#FFFFFF'; // Valor padrão se não houver correspondência
+        }
+
+
+        // Set the background color dynamically
+        container.style.backgroundColor = cor;
+
+        const satisfactionInfo = document.querySelector("#avg-satisfaction-info");
+
+        if (satisfactionInfo) {
+          const satisfactionIcon = satisfactionInfo.querySelector(".info-icon");
+          if (data.satisfaction >= 7) {
+            satisfactionIcon.classList.add("satisfaction-icon--high");
+          } else if (data.satisfaction >= 5) {
+            satisfactionIcon.classList.add("satisfaction-icon--medium");
+          } else {
+            satisfactionIcon.classList.add("satisfaction-icon--low");
+          }
+        }
+        const notesTextArea = document.getElementById('notes');
+
+        // Define o valor do textarea
+        notesTextArea.value = data.notes;
+
+        // Acessar as sessões do paciente
+        const sessoes = document.getElementById('sessoes');
+
+        const sessionList = document.getElementById('session-list');
+        sessionList.style.display = 'none';
+        data.sessions.forEach((session, index) => {
+          const sessionInfo = document.createElement('div');
+          sessionInfo.classList.add('session-info');
+          sessionInfo.classList.add(`session-${session.painLevel}`);
+          sessionInfo.setAttribute("id", "session-" + (index + 1));
+
+          const sessionHeading = document.createElement('h3');
+          sessionHeading.classList.add('session-heading');
+          sessionHeading.innerHTML = `<span style="color: black;">${index + 1}</span>`;
+          const closeButton = document.createElement('span');
+          closeButton.classList.add('close-button');
+          closeButton.innerHTML = '&times;'; // Usando o símbolo "x" como HTML
+          closeButton.style.display = 'none';
+
+          sessionInfo.appendChild(closeButton);
+
+          //sessionHeading.innerHTML = `<span style="margin-right: 10px; color: black;">Sessão ${index + 1}</span>`;
+
+          //sessionHeading.innerHTML = `<span style="margin-right: 10px; color: black;">Sessão ${index + 1} -- > Nível de Dor: ${session.painLevel}</span>`;
+          sessionInfo.appendChild(sessionHeading);
+
+          const movementList = document.createElement('ul');
+          movementList.classList.add('movement-list');
+          sessionInfo.appendChild(movementList);
+          session.movements.forEach((movement) => {
+            const movementListItem = document.createElement("li");
+            movementListItem.classList.add("movement-list-item");
+
+
+
+            movementListItem.textContent = `${movement.movimento}   `;
+            movementList.appendChild(movementListItem);
+            // Crie um elemento de ícone
+            const icon = document.createElement("i");
+            icon.classList.add("fas", "fa-chart-line", "clickable-icon");
+            // Adicione o ícone ao item da lista
+            movementListItem.appendChild(icon);
+            // Adicionar evento de clique ao item da lista
+            movementListItem.addEventListener("click", () => {
+              showMovementData(movement, index);
+            });
+
+          });
+
+
+          // Toggle para mostrar/ocultar a lista de movimentos ao clicar no cabeçalho
+          sessionHeading.addEventListener('click', () => {
+            movementList.style.display = movementList.style.display === 'none' ? 'block' : 'none';
+          });
+          closeButton.addEventListener('click', () => {
+            // Obtém o ID da sessão
+            const sessionId = sessionInfo.getAttribute('id');
+            // Remove a sessão do paciente com base no ID
+            removeSessionFromPatient(sessionId);
+            // Remove a sessão da exibição
+            sessionInfo.remove();
+          });
+
+
+          sessionList.appendChild(sessionInfo);
+        });
+        sessoes.addEventListener('click', () => {
+          sessionList.style.display = sessionList.style.display === 'none' ? 'block' : 'none';
+        });
+
+        var abas_abertas = 0;
+
+        function removeSessionFromPatient(sessionId) {
+          // Obtenha o número da sessão a partir do ID
+          const sessionNumber = parseInt(sessionId.replace('session-', ''));
+          // Remova a sessão do paciente pelo número da sessão
+          paciente.sessions.splice(sessionNumber - 1, 1);
+          paciente.numSessoes = paciente.sessions.length;
+          document.getElementById('patient-session-count').textContent = paciente.numSessoes;
+        }
+
+
+        function calculateAverage(array) {
+          const sum = array.reduce((acc, value) => acc + value, 0);
+          return sum / array.length;
+        }
+
+        // Função para calcular a média dos máximos
+        function calculateAverageMaxima(data) {
+          const peaks = [];
+          let max = -Infinity;
+
+          for (let i = 1; i < data.length - 1; i++) {
+            if (data[i] > data[i - 1] && data[i] > data[i + 1]) {
+              peaks.push(data[i]);
+              max = Math.max(max, data[i]);
+            }
+          }
+
+          const averageMaxima = calculateAverage(peaks);
+          return { max, averageMaxima };
+        }
+
+        // Função para calcular a média dos mínimos
+        function calculateAverageMinima(data) {
+          const valleys = [];
+          let min = Infinity;
+
+          for (let i = 1; i < data.length - 1; i++) {
+            if (data[i] < data[i - 1] && data[i] < data[i + 1]) {
+              valleys.push(data[i]);
+              min = Math.min(min, data[i]);
+            }
+          }
+
+          const averageMinima = calculateAverage(valleys);
+          return { min, averageMinima };
+        }
+
+        function calculateAmplitudeStatistics(jointData) {
+          const min = d3.min(jointData);
+          const max = d3.max(jointData);
+          const range = max - min;
+          const mean = d3.mean(jointData);
+          const median = d3.median(jointData);
+
+          return {
+            min,
+            max,
+            range,
+            mean,
+            median,
+          };
+        }
+
+        function getColorByJoint(joint) {
+          if (joint === 'Range of Motion Shoulder (Left)') return '#FF3333';
+          if (joint === 'Range of Motion Shoulder (Right)') return '#FF9999';
+          if (joint === 'elbowLeft') return '#FF9933';
+          if (joint === 'elbowRight') return '#FFCC99';
+          if (joint === 'wristLeft') return '#FFFF33';
+          if (joint === 'wristRight') return '#FFFF99';
+          if (joint === 'hipLeft') return '#33FF77';
+          if (joint === 'hipRight') return '#B3FFCC';
+          if (joint === 'kneeLeft') return '#66B3FF';
+          if (joint === 'kneeRight') return '#D6E9FF';
+          if (joint === 'ankleLeft') return '#FF00FF';
+          if (joint === 'ankleRight') return '#9900FF';
+          return 'gray'; // Cor padrão
+        }
+
+
+
+
+        function showMovementData(movement, i) {
+          console.log(juntas_selecionadas.length)
+          if (juntas_selecionadas.length) {
+            abas_abertas += 1;
+            console.log(movement)
+            // Exibir os dados de cada junta do movimento clicado
+            // console.log('Movimento:', movement.movimento);
+            // console.log('Dados de ROM:');
+            // movement.data.forEach(frame => {
+            //   console.log('Frame:', frame.frame);
+            //   console.log('Shoulder (Left):', frame.shoulderLeft);
+            //   console.log('Shoulder (Right):', frame.shoulderRight);
+            //   console.log('Elbow (Left):', frame.elbowLeft);
+            //   console.log('Elbow (Right):', frame.elbowRight);
+            //   console.log('Wrist (Left):', frame.wristLeft);
+            //   console.log('Wrist (Right):', frame.wristRight);
+            //   console.log('Hip (Left):', frame.hipLeft);
+            //   console.log('Hip (Right):', frame.hipRight);
+            //   console.log('Knee (Left):', frame.kneeLeft);
+            //   console.log('Knee (Right):', frame.kneeRight);
+            //   console.log('Ankle (Left):', frame.ankleLeft);
+            //   console.log('Ankle (Right):', frame.ankleRight);
+            //   console.log('---------------------');
+            // });
+
+            // Gerar gráficos de linha para as juntas Shoulder (Left) e Shoulder (Right)
+
+            //const shoulderLeftData = movement.data.map(frame => frame.shoulderLeft);
+            //const shoulderRightData = movement.data.map(frame => frame.shoulderRight);
+            //const framesData = movement.data.map(frame => frame[juntas_selecionadas[junta]]);
+            const newWindow = window.open('', `Gráficos de ${movement.movimento}${abas_abertas}`, 'width=600,height=800');
+const style = newWindow.document.createElement('style');
+style.innerHTML = `
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+  }
+
+  h1 {
+    text-align: center;
+    color: #333;
+    margin: 20px 0;
+  }
+
+  .info-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 20px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .info-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .info-panel-item {
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  .info-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .info-title,
+  .info-value {
+    width: 100%;
+    text-align: center;
+    padding: 10px; /* Adicionado padding para melhorar a aparência */
+  }
+
+  .info-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 5px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    color: #777;
+  }
+
+  /* Adicione estilos para os quadrados coloridos */
+  .color-square-1 { background-color: #ffcccb; }
+  .color-square-2 { background-color: #ffd700; }
+  .color-square-3 { background-color: #98fb98; }
+  .color-square-4 { background-color: #dda0dd; }
+  .color-square-5 { background-color: #87ceeb; }
+  .color-square-6 { background-color: #ff8c00; }
+  .color-square-7 { background-color: #c0c0c0; }
+`;
+
+newWindow.document.head.appendChild(style);
+
+newWindow.document.write(`
+  <html>
+    <head>
+      <h1 style="text-align:center;">Sessão ${i + 1}: Gráficos de ${movement.movimento}</h1>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    </head>
+    <body>
+      <div id="info_cont" class="info-container"></div>
+    </body>
+  </html>
+`);
+
+            for (junta in juntas_selecionadas) {
+              const joint = juntas_selecionadas[junta];
+              let framesData = movement.data[0].map(frame => frame[joint]);
+              console.log(joint, framesData)
+              const labels = framesData.map((_, index) => index + 1);
+              framesData = applyGaussianFilter(framesData, 6)
+              framesData = applyMovingAverage(framesData, 15); // Aplica o filtro de média móvel com janela de tamanho 5
+
+              const { max: max, averageMaxima: avgMax } = calculateAverageMaxima(framesData);
+              const { min: min, averageMinima: avgMin } = calculateAverageMinima(framesData);
+              const decomposition = seasonalDecomposition(framesData);
+
+              const trend = decomposition.trend;
+              const seasonal = decomposition.seasonal;
+              const residual = decomposition.residual;
+
+              const infoContainer = newWindow.document.createElement('div');
+              infoContainer.classList.add('info-container');
+              infoContainer.classList.add(`color-square-${parseInt(junta) % 7 + 1}`); // Adiciona a classe color-square
+
+              infoContainer.style.padding = '10px';
+              infoContainer.style.backgroundColor = '#f1f1f1';
+
+              const maximaLabel = newWindow.document.createElement('p');
+              maximaLabel.textContent = 'Média dos máximos:';
+              const maximaValue = newWindow.document.createElement('p');
+              maximaValue.textContent = ` ${avgMax.toFixed(2)}`;
+
+              const minimaLabel = newWindow.document.createElement('p');
+              minimaLabel.textContent = 'Média dos mínimos:';
+              const minimaValue = newWindow.document.createElement('p');
+              minimaValue.textContent = `${avgMin.toFixed(2)}`;
+
+              maximaLabel.style.fontWeight = 'bold';
+              minimaLabel.style.fontWeight = 'bold';
+
+              infoContainer.appendChild(maximaLabel);
+              infoContainer.appendChild(maximaValue);
+              infoContainer.appendChild(minimaLabel);
+              infoContainer.appendChild(minimaValue);
+
+              // Informações sobre a tendência
+              const trendLabel = newWindow.document.createElement('p');
+              trendLabel.textContent = 'Tendência:';
+              const trendValue = newWindow.document.createElement('p');
+              trendValue.textContent = decomposition.trend.trendType === 'ascendente' ? 'Ascendente' : 'Descendente';
+              const trendIcon = newWindow.document.createElement('i');
+              trendIcon.classList.add('fas');
+              trendIcon.classList.add(decomposition.trend.trendType === 'ascendente' ? 'fa-arrow-up' : 'fa-arrow-down');
+              trendValue.prepend(trendIcon);
+
+              infoContainer.appendChild(trendLabel);
+              infoContainer.appendChild(trendValue);
+
+              const smoothedSeasonal = seasonal;
+
+
+              const seasonalDurationLabel = newWindow.document.createElement('p');
+              seasonalDurationLabel.textContent = 'Duração da sazonalidade:';
+              const seasonalDurationValue = newWindow.document.createElement('p');
+
+              const seasonalPeaks = findPeaks(smoothedSeasonal);
+              console.log(seasonalPeaks);
+              const distances = calculateDistances(seasonalPeaks);
+              const averageDistance = calculateAverageDistance(distances);
+
+              seasonalDurationValue.textContent = `${averageDistance.toFixed(2)} frames`;
+
+              const seasonalAmplitudeLabel = newWindow.document.createElement('p');
+              seasonalAmplitudeLabel.textContent = 'Amplitude da sazonalidade:';
+              const seasonalAmplitudeValue = newWindow.document.createElement('p');
+              const seasonalMax = Math.max(...seasonal);
+              const seasonalMin = Math.min(...seasonal);
+              const seasonalAmplitude = seasonalMax - seasonalMin;
+              const cycleAmplitudes = [];
+              for (let i = 0; i < distances.length; i++) {
+                const startIndex = seasonalPeaks[i];
+                const endIndex = seasonalPeaks[i + 1] || seasonal.length - 1;
+                const cycle = framesData.slice(startIndex, endIndex + 1);
+                const cycleMax = Math.max(...cycle);
+                const cycleMin = Math.min(...cycle);
+                console.log(cycle[0])
+                console.log(cycleMax)
+                console.log(cycleMin)
+                const cycleAmplitude = cycleMax - cycleMin;
+                cycleAmplitudes.push(cycleAmplitude);
+              }
+              console.log(cycleAmplitudes)
+
+              const averageAmplitude = cycleAmplitudes.reduce((sum, amplitude) => sum + amplitude, 0) / cycleAmplitudes.length;
+              seasonalAmplitudeValue.textContent = `${averageAmplitude.toFixed(2)}`;
+
+              const randomVariationLabel = newWindow.document.createElement('p');
+              randomVariationLabel.textContent = 'Variação aleatória:';
+              const randomVariationValue = newWindow.document.createElement('p');
+              const reconstructedData = seasonal.map((value, index) => value + trend[index]);
+              const randomVariation = framesData.map((value, index) => value - reconstructedData[index]);
+              const randomVariationStdDev = standardDeviation(randomVariation);
+              randomVariationValue.textContent = `${randomVariationStdDev.toFixed(2)}`;
+
+
+              // Função para encontrar picos e vales significativos na série
+              function findPeaks(series) {
+                const peaks = [];
+                const true_peaks = [];
+                for (let i = 1; i < series.length - 1; i++) {
+                  if (series[i] > series[i - 1] && series[i] > series[i + 1]) {
+                    peaks.push(i);
+                  }
+                }
+                console.log(peaks);
+                for (let i = 1; i < peaks.length - 1; i++) {
+                  if ((peaks[i] - peaks[i - 1]) > 15 && (peaks[i + 1] - peaks[i]) > 15) true_peaks.push(peaks[i]);
+                }
+                return true_peaks;
+              }
+
+
+              // Função para calcular as distâncias entre os picos/vales
+              function calculateDistances(peaks) {
+                const distances = [];
+                for (let i = 1; i < peaks.length; i++) {
+                  distances.push(peaks[i] - peaks[i - 1]);
+                }
+                return distances;
+              }
+
+              // Função para calcular a média das distâncias
+              function calculateAverageDistance(distances) {
+                const sum = distances.reduce((acc, distance) => acc + distance, 0);
+                return sum / distances.length;
+              }
+
+              function standardDeviation(values) {
+                const avg = average(values);
+                const squareDiffs = values.map(value => (value - avg) ** 2);
+                const avgSquareDiff = average(squareDiffs);
+                const stdDev = Math.sqrt(avgSquareDiff);
+                return stdDev;
+              }
+
+              // Função para calcular a média
+              function average(values) {
+                const sum = values.reduce((acc, value) => acc + value, 0);
+                return sum / values.length;
+              }
+
+              function applyGaussianFilter(series, sigma) {
+                const filteredSeries = [];
+                for (let i = 0; i < series.length; i++) {
+                  let sum = 0;
+                  let weightSum = 0;
+                  for (let j = -3; j <= 3; j++) {
+                    const index = i + j;
+                    if (index >= 0 && index < series.length) {
+                      const weight = Math.exp(-((j * j) / (2 * sigma * sigma)));
+                      sum += series[index] * weight;
+                      weightSum += weight;
+                    }
+                  }
+                  filteredSeries.push(sum / weightSum);
+                }
+                return filteredSeries;
+              }
+
+              function applyMovingAverage(data, windowSize) {
+                const smoothedData = [];
+
+                for (let i = 0; i < data.length; i++) {
+                  const startIndex = Math.max(0, i - Math.floor(windowSize / 2));
+                  const endIndex = Math.min(data.length - 1, i + Math.floor(windowSize / 2));
+
+                  let sum = 0;
+                  let count = 0;
+                  for (let j = startIndex; j <= endIndex; j++) {
+                    sum += data[j];
+                    count++;
+                  }
+
+                  const average = sum / count;
+                  smoothedData.push(average);
+                }
+
+                return smoothedData;
+              }
+              infoContainer.appendChild(seasonalDurationLabel);
+              infoContainer.appendChild(seasonalDurationValue);
+              infoContainer.appendChild(seasonalAmplitudeLabel);
+              infoContainer.appendChild(seasonalAmplitudeValue);
+              infoContainer.appendChild(randomVariationLabel);
+              infoContainer.appendChild(randomVariationValue);
+
+              const svgContainer = newWindow.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              svgContainer.setAttribute('width', '600');
+              svgContainer.setAttribute('height', '400');
+              svgContainer.setAttribute('style', 'border: 1px solid black');
+              newWindow.document.body.appendChild(svgContainer);
+              newWindow.document.body.appendChild(infoContainer);
+              const margin = { top: 20, right: 20, bottom: 50, left: 50 };
+              const width = 600 - margin.left - margin.right;
+              const height = 400 - margin.top - margin.bottom;
+
+              const xScale = d3.scaleLinear()
+                .domain([0, framesData.length])
+                .range([0, width]);
+
+              const yScale = d3.scaleLinear()
+                .domain([d3.min(framesData), d3.max(framesData) + 5])
+                .range([height, 0]);
+
+              const line = d3.line()
+                .x((d, i) => xScale(i))
+                .y(d => yScale(d))
+                .curve(d3.curveMonotoneX);
+
+              const xAxis = d3.axisBottom(xScale);
+              const yAxis = d3.axisLeft(yScale);
+
+              const svg = d3.select(svgContainer)
+                .append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+              svg.append("text")
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2) + 10)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("text-decoration", "underline")
+                .text(juntas_selecionadas[junta]);
+
+              svg.append('g')
+                .attr('class', 'x-axis')
+                .attr('transform', `translate(0, ${height})`)
+                .call(xAxis)
+                .append('text')
+                .attr('class', 'axis-label')
+                .attr('x', width / 2)
+                .attr('y', 40)
+                .attr('fill', '#000')
+                .text('Frames');
+
+              svg.append('g')
+                .attr('class', 'y-axis')
+                .call(yAxis)
+                .append('text')
+                .attr('class', 'axis-label')
+                .attr('x', -height / 2)
+                .attr('y', -40)
+                .attr('fill', '#000')
+                .attr('transform', 'rotate(-90)')
+                .text('Range of Motion');
+
+
+              svg.append('path')
+                .datum(framesData)
+                .attr('class', 'line')
+                .attr('d', line)
+                .attr('fill', 'none')
+                .attr('stroke', 'steelblue')
+                .attr('stroke-width', 2);
+
+              const brush = d3.brushX()
+                .extent([[0, 0], [width, height]])
+                .on('end', brushed);
+
+              svg.append('g')
+                .attr('class', 'brush')
+                .call(brush);
+
+              /*const pointsGroup = svg.append('g')
+                .attr('class', 'points');
+              // Encontrar as coordenadas dos picos sazonais
+              const seasonalPeakData = seasonalPeaks.map((index) => {
+                return {
+                  index: index,
+                  value: framesData[index]
+                };
+              });
+
+              // Adicionar pontos no gráfico
+              pointsGroup.selectAll('circle')
+                .data(seasonalPeakData)
+                .enter()
+                .append('circle')
+                .attr('cx', (d) => xScale(d.index))
+                .attr('cy', (d) => yScale(d.value))
+                .attr('r', 3)
+                .attr('fill', 'red');*/
+
+
+              const yScaleComponents = d3.scaleLinear()
+                .domain([d3.min(decomposition.seasonal.concat(decomposition.residual)), d3.max(decomposition.seasonal.concat(decomposition.residual))])
+                .range([height, 0]);
+
+              // ...
+
+              const lineComponents = d3.line()
+                .x((d, i) => xScale(i))
+                .y(d => yScaleComponents(d))
+                .curve(d3.curveMonotoneX);
+              // Criação do segundo subgráfico para os componentes
+              // Criação do segundo subgráfico para os componentes
+              let showComponents = false;
+
+              const svgComponents = d3.select(svgContainer)
+                .append('g')
+                .attr('transform', `translate(${margin.left + width + margin.right + 50}, ${margin.top})`);
+
+              svgComponents.append("text")
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2) + 10)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("text-decoration", "underline")
+                .text('Decomposição Sazonal');
+
+              svgComponents.append('g')
+                .attr('class', 'x-axis')
+                .attr('transform', `translate(0, ${height})`)
+                .call(xAxis)
+                .append('text')
+                .attr('class', 'axis-label')
+                .attr('x', width / 2)
+                .attr('y', 40)
+                .attr('fill', '#000')
+                .text('Índice');
+
+              svgComponents.append('g')
+                .attr('class', 'y-axis')
+                .call(yAxis)
+                .append('text')
+                .attr('class', 'axis-label')
+                .attr('x', -height / 2)
+                .attr('y', -40)
+                .attr('fill', '#000')
+                .attr('transform', 'rotate(-90)')
+                .text('Valor');
+
+              // Função para alternar a exibição do gráfico dos componentes
+              function toggleComponents() {
+                showComponents = !showComponents;
+
+                if (showComponents) {
+                  // Ajustar o tamanho do SVG para acomodar os dois gráficos
+                  const totalWidth = (width) * 2 + 2 * margin.left + 2 * margin.right + 150;
+                  svgContainer.setAttribute('width', totalWidth);
+                  svgComponents.style('display', 'inline');
+                  newWindow.resizeTo(totalWidth - 100, newWindow.innerHeight);
+                } else {
+                  // Restaurar o tamanho original do SVG e ocultar o gráfico de componentes
+                  svgContainer.setAttribute('width', width + margin.left + margin.right);
+                  svgComponents.style('display', 'none');
+                  newWindow.resizeTo(width + margin.left + margin.right, newWindow.innerHeight);
+
+                }
+              }
+
+              // Criação do botão para alternar a exibição do gráfico dos componentes
+              const button = newWindow.document.createElement('button');
+              button.textContent = 'Mostrar Componentes';
+              button.addEventListener('click', toggleComponents);
+              newWindow.document.body.appendChild(button);
+
+              // Desenhar linha do componente de tendência
+              svgComponents.append('path')
+                .datum(decomposition.trend)
+                .attr('class', 'line')
+                .attr('d', lineComponents)
+                .attr('fill', 'none')
+                .attr('stroke', 'orange')
+                .attr('stroke-width', 2);
+
+              // Desenhar linha do componente de sazonalidade
+              svgComponents.append('path')
+                .datum(decomposition.seasonal)
+                .attr('class', 'line')
+                .attr('d', lineComponents)
+                .attr('fill', 'none')
+                .attr('stroke', 'green')
+                .attr('stroke-width', 2);
+
+              // Desenhar linha do componente residual
+              svgComponents.append('path')
+                .datum(decomposition.residual)
+                .attr('class', 'line')
+                .attr('d', lineComponents)
+                .attr('fill', 'none')
+                .attr('stroke', 'red')
+                .attr('stroke-width', 2);
+
+              // Legenda
+              const legend = svgComponents.append('g')
+                .attr('transform', `translate(${width + 20}, ${height - 300})`);
+
+              legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 20)
+                .attr('width', 10)
+                .attr('height', 10)
+                .attr('fill', 'green');
+
+              legend.append('text')
+                .attr('x', 15)
+                .attr('y', 30)
+                .text('Sazonalidade')
+                .style('font-size', '12px');
+
+              legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 10)
+                .attr('height', 10)
+                .attr('fill', 'orange');
+
+              legend.append('text')
+                .attr('x', 15)
+                .attr('y', 10)
+                .text('Tendência')
+                .style('font-size', '12px');
+
+
+
+              legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 40)
+                .attr('width', 10)
+                .attr('height', 10)
+                .attr('fill', 'red');
+
+              legend.append('text')
+                .attr('x', 15)
+                .attr('y', 50)
+                .text('Residual')
+                .style('font-size', '12px');
+
+
+              svg.on('dblclick', resetChart);
+
+              // Função para redefinir o gráfico
+              function resetChart() {
+
+                xScale.domain([0, framesData.length])
+                  .range([0, width]);
+
+                yScale.domain([d3.min(framesData), d3.max(framesData) + 5])
+                  .range([height, 0]);
+
+
+                svg.select('.x-axis')
+                  .transition()
+                  .call(xAxis);
+
+                svg.select('.y-axis')
+                  .transition()
+                  .call(yAxis);
+
+                svg.select('.line')
+                  .datum(framesData)
+                  .transition()
+                  .attr('d', line);
+              }
+
+
+              // Inicialmente, selectedData contém todos os valores de framesData
+              // Inicialmente, selectedData contém todos os valores de framesData
+              // Inicialmente, selectedData contém todos os valores de framesData
+              let selectedData = framesData.slice();
+
+              function brushed() {
+                if (!d3.brushSelection(this)) return;
+
+                const selection = d3.brushSelection(this);
+                const selectedIndices = selection.map(xScale.invert);
+                const startIndex = Math.round(selectedIndices[0]);
+                const endIndex = Math.round(selectedIndices[1]);
+
+                // Atualize selectedData para manter apenas os valores selecionados
+                selectedData = framesData.map((value, index) => {
+                  if (index >= startIndex && index <= endIndex) {
+                    return value;
+                  } else {
+                    return undefined;
+                  }
+                });
+
+                // Filtrar os valores null do conjunto de dados e ajustar o índice
+                const filteredData = selectedData
+                  .map((value, index) => ({ value, index: index + startIndex }))
+                  .filter(({ value }) => !isNaN(value))
+                  .map(({ value }) => value);
+                console.log(filteredData)
+                // Atualize o domínio dos eixos x e y
+                xScale.domain([0, endIndex - startIndex]);
+                //yScale.domain([d3.min(filteredData), d3.max(filteredData)]);
+
+                // Atualize os elementos do gráfico
+                svg.select('.x-axis')
+                  .transition()
+                  .call(xAxis);
+
+                svg.select('.y-axis')
+                  .transition()
+                  .call(yAxis);
+
+                svg.select('.line')
+                  .datum(filteredData)
+                  .transition()
+                  .attr('d', line);
+
+                svg.select(".brush").call(brush.move, null)
+              }
+
+            }
+
+            newWindow.document.close();
+
+
+          } else {
+            Swal.fire({
+              title: "Nenhuma junta selecionada",
+              text: "Por favor, selecione uma junta para ser plotada.",
+              icon: "warning",
+              confirmButtonColor: "#3085d6",
+              confirmButtonText: "OK",
+            });
+            return;
+          }
+
+        }
+        // Criação do gráfico de progressão da dor
+        const painData = data.sessions.map((session, index) => ({
+          session: index + 1,
+          painLevel: session.painLevel,
+          color: session.painLevel === 10 ? '#FF3333' :
+            session.painLevel === 9 ? '#FF9999' :
+              session.painLevel === 8 ? '#FF9933' :
+                session.painLevel === 7 ? '#FFCC99' :
+                  session.painLevel === 6 ? '#FFFF33' :
+                    session.painLevel === 5 ? '#FFFF99' :
+                      session.painLevel === 4 ? '#33FF77' :
+                        session.painLevel === 3 ? '#B3FFCC' :
+                          session.painLevel === 2 ? '#66B3FF' :
+                            session.painLevel === 1 ? '#D6E9FF' :
+                              session.painLevel === 0 ? '#d9d6d6' :
+                                '#000000'
+        }));
+
+        const width = 450;
+        const height = 320;
+        const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+
+        const svg = d3.select("#pain-chart")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+        const xScale = d3.scaleBand()
+          .domain(painData.map(d => d.session))
+          .range([margin.left, width - margin.right])
+          .padding(0.2);
+
+        const yScale = d3.scalePoint()
+          .domain([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+          .range([margin.top, height - margin.bottom]);
+
+        svg.append("g")
+          .attr("transform", `translate(0, ${height - margin.bottom})`)
+          .call(d3.axisBottom(xScale));
+
+        svg.append("g")
+          .attr("transform", `translate(${margin.left}, 0)`)
+          .call(d3.axisLeft(yScale));
+
+        svg.append("text")
+          .attr("class", "x-axis-title")
+          .attr("x", (width - margin.left - margin.right) / 2 + margin.left)
+          .attr("y", height - margin.bottom + 40)
+          .attr("text-anchor", "middle")
+          .text("Sessões");
+        const line = d3.line()
+          .x(d => xScale(d.session) + xScale.bandwidth() / 2)
+          .y(d => yScale(d.painLevel))
+          .curve(d3.curveMonotoneX);
+
+
+        svg.selectAll(".dot")
+          .data(painData)
+          .join("circle")
+          .attr("class", "dot")
+          .attr("cx", d => xScale(d.session) + xScale.bandwidth() / 2)
+          .attr("cy", d => yScale(d.painLevel))
+          .attr("r", 5)
+          .attr("fill", d => {
+            if (d.painLevel === 10) return '#FF3333';
+            if (d.painLevel === 9) return '#FF9999';
+            if (d.painLevel === 8) return '#FF9933';
+            if (d.painLevel === 7) return '#FFCC99';
+            if (d.painLevel === 6) return '#FFFF33';
+            if (d.painLevel === 5) return '#FFFF99';
+            if (d.painLevel === 4) return '#33FF77';
+            if (d.painLevel === 3) return '#B3FFCC';
+            if (d.painLevel === 2) return '#66B3FF';
+            if (d.painLevel === 1) return '#D6E9FF';
+            if (d.painLevel === 0) return '#d9d6d6';
+
+          })
+          .on("click", (event, d) => {
+            const sessionDiv = document.querySelector(`#session-${d.session}`);
+            if (sessionDiv) {
+              const lastChild = sessionDiv.lastElementChild;
+              if (lastChild) {
+                if (sessionList.style.display == 'none') {
+                  lastChild.style.display = sessionList.style.display = 'block';
+                } else {
+                  lastChild.style.display = lastChild.style.display === 'none' ? 'block' : 'none';
+                }
+              }
+
+            } else {
+              console.log(`Element with id 'session-${d.session}' not found.`);
+            }
+
+
+          });
+
+
+
+        // Importe a biblioteca de curvas
+        const curve = d3.curveCatmullRom;
+
+        // Criar linhas conectando os pontos consecutivos do gráfico
+        for (let i = 0; i < painData.length - 1; i++) {
+          const lineData = [
+            { session: painData[i].session, painLevel: painData[i].painLevel },
+            { session: painData[i + 1].session, painLevel: painData[i + 1].painLevel }
+          ];
+
+          const lineGenerator = d3.line()
+            .x(d => xScale(d.session) + xScale.bandwidth() / 2)
+            .y(d => yScale(d.painLevel))
+            .curve(d3.curveBasis);
+
+          svg.append("path")
+            .datum(lineData)
+            .attr("d", lineGenerator)
+            .attr("fill", "none")
+            .attr("stroke", painData[i].color)
+            .attr("stroke-width", 2);
+        }
+        // Adicionar uma linha vertical no último ponto
+        const lastPoint = painData[painData.length - 1];
+        svg.append("line")
+          .attr("x1", xScale(lastPoint.session) + xScale.bandwidth() / 2)
+          .attr("y1", yScale(lastPoint.painLevel))
+          .attr("x2", xScale(lastPoint.session) + xScale.bandwidth() / 2)
+          .attr("y2", height - margin.bottom)
+          .attr("stroke", painData[painData.length - 1].color)
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "5, 5");
+
+        //legenda
+
+        const legend = svg.append("g")
+          .attr("class", "legend")
+          .attr("transform", `translate(${width - margin.right}, ${margin.top})`);
+
+        const legendData = [
+          { painLevel: 10, color: "#FF3333", text: "Insuportável" },
+          { painLevel: 9, color: "#FF9999", text: "Muito extrema" },
+          { painLevel: 8, color: "#FF9933", text: "Extrema" },
+          { painLevel: 7, color: "#FFCC99", text: "Muito forte" },
+          { painLevel: 6, color: "#FFFF33", text: "Muito intensa" },
+          { painLevel: 5, color: "#FFFF99", text: "Intensa" },
+          { painLevel: 4, color: "#33FF77", text: "Considerável" },
+          { painLevel: 3, color: "#B3FFCC", text: "Moderada" },
+          { painLevel: 2, color: "#66B3FF", text: "Leve" },
+          { painLevel: 1, color: "#D6E9FF", text: "Muito leve " },
+          { painLevel: 0, color: "#d9d6d6", text: "Nenhuma " },
+
+        ];
+
+
+        const legendItem = legend.selectAll(".legend-item")
+          .data(legendData)
+          .enter()
+          .append("g")
+          .attr("class", "legend-item")
+          .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+
+        const legendRectSize = 8; // Tamanho do retângulo da legenda
+        const legendSpacing = 12; // Espaçamento entre as legendas
+        svg.attr("width", width + 10 * legendSpacing);
+
+        legendItem.append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", legendRectSize)
+          .attr("height", legendRectSize)
+          .attr("fill", d => d.color);
+
+        legendItem.append("text")
+          .attr("x", legendRectSize + 5)
+          .attr("y", legendRectSize / 2)
+          .text(d => `${d.text}`)
+          .style("font-size", "18px") // Increase the font size here
+          .attr("alignment-baseline", "middle");
+
+        // Ajuste a posição do gráfico para criar espaço para a legenda
+        svg.attr("height", height + margin.top + legendData.length * legendSpacing);
+
+
+
+        const movementsData = data.sessions.flatMap(session => session.movements);
+        //console.log(movementsData)
+        // Função para contar a ocorrência dos movimentos
+        function countMovements(movementsData) {
+          const counts = {};
+          movementsData.forEach((movement) => {
+
+            counts[movement.movimento] = (counts[movement.movimento] || 0) + 1;
+          });
+          return counts;
+        }
+
+        // Contagem dos movimentos
+        const movementCounts = countMovements(movementsData);
+        //console.log(movementCounts)
+        // Conversão dos dados para o formato esperado pelo gráfico de rosca
+        const pieData = Object.entries(movementCounts).map(([movement, count]) => ({
+          movement,
+          count
+        }));
+        pieData.sort((a, b) => (a.movement > b.movement) ? 1 : ((b.movement > a.movement) ? -1 : 0))
+
+        //console.log(pieData);
+        // Configurações do gráfico
+        const radius = Math.min(width, height) / 2 - 10;
+        const colors = d3.scaleOrdinal(d3.schemeCategory10);
+        const width2 = 600;
+        // Criação do elemento SVG
+        const svg1 = d3.select("#movement-chart ")
+          .append("svg")
+          .attr("width", width2)
+          .attr("height", height)
+          .append("g")
+          .attr("transform", `translate(${width2 / 2 - 150}, ${height / 2})`);
+
+        // Criação do layout de pizza (pie layout)
+        const pie = d3.pie()
+          .value(d => d.count)
+          .sort(null);
+
+        // Criação do arco
+        const arc = d3.arc()
+          .innerRadius(radius * 0.5)
+          .outerRadius(radius * 0.8);
+
+        // Criação das fatias (arcos) do gráfico de rosca
+        const slices = svg1.selectAll("slice")
+          .data(pie(pieData))
+          .enter()
+          .append("g")
+          .attr("class", "slice");
+
+        // Desenho dos arcos (fatias)
+        slices.append("path")
+          .attr("d", arc)
+          .attr("fill", (d, i) => colors(d.data.movement));
+
+
+        // Adição de rótulos das fatias
+        slices.append("text")
+          .attr("transform", d => `translate(${arc.centroid(d)})`)
+          .attr("text-anchor", "middle")
+          .attr("dy", "0.35em")
+          .text(d => `${d.data.count}`);
+
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        svg1.append('g')
+          .attr('class', 'legend')
+          .selectAll('text')
+          .data(pieData)
+          .enter()
+          .append('text')
+          .style("font-size", "20px") // Increase the font size here
+          .text(function (d) { return d.movement; })
+          .attr('fill', function (d) { return color(d.movement); })
+          .attr('y', function (d, i) { return 25 * (i + 1); })
+          .attr('x', function (d, i) { return 170 })
+          .attr('dy', function (d, i) { return -100 })
+
+        svg1.selectAll("mydots")
+          .data(pieData)
+          .enter()
+          .append("circle")
+          .attr("cx", 150)
+          .attr('y', function (d, i) { return 20 * (i + 1); })
+          .attr("cy", function (d, i) { return i * 25 - 80 }) // 100 is where the first dot appears. 25 is the distance between dots
+          .attr("r", 7)
+          .style("fill", function (d) { return color(d.movement) })
+
+
+        const width1 = 150;
+        const height1 = 300;
+
+        // Dados das juntas
+        const jointData = [
+          { joint: 'head' },
+          { joint: 'shoulders' },
+          { joint: 'Range of Motion Shoulder (Left)' },
+          { joint: 'Range of Motion Shoulder (Right)' },
+          { joint: 'elbowLeft' },
+          { joint: 'elbowRight' },
+          { joint: 'wristLeft' },
+          { joint: 'wristRight' },
+          { joint: 'hipLeft' },
+          { joint: 'hipRight' },
+          { joint: 'kneeLeft' },
+          { joint: 'kneeRight' },
+          { joint: 'ankleLeft' },
+          { joint: 'ankleRigh' }
+
+          // Adicionar dados para as outras juntas
+        ];
+
+        // Escala de cores
+        colorScale = d3.scaleLinear()
+          .domain([1, 10])
+          .range(['#D6E9FF', '#66B3FF']);
+
+        // Função para desenhar o gráfico de linha da junta selecionada
+
+        var juntas_selecionadas = []
+        // Função para lidar com a seleção da junta
+        function handleJointSelection(joint) {
+          console.log(d3.select(this).attr("id"))
+
+          d3.select(this).classed('selected', !d3.select(this).classed('selected'));
+          juntas_selecionadas = Array.from(document.querySelectorAll('.selected')).map(el => el.id);
+          console.log(juntas_selecionadas)
+        }
+
+        const svg3 = d3.select("#corpo")
+          .append("svg")
+          .attr("width", width1)
+          .attr("height", height1);
+
+        const drawLine = (x1, y1, x2, y2) => {
+          body.append("line")
+            .attr("x1", x1)
+            .attr("y1", y1)
+            .attr("x2", x2)
+            .attr("y2", y2)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 2);
+        };
+
+
+        // Desenho das juntas do corpo humano
+        const body = svg3.append("g")
+          .attr("class", "body");
+        // Cabeça
+        // Cabeça
+        body.append('circle')
+          .attr('cx', width1 / 2)
+          .attr('cy', height1 / 2 - 100)
+          .attr('r', 15)
+          .attr('id', 'head')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2, height1 / 2 - 85, width1 / 2, height1 / 2 - 60);
+
+        // Ombro Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 20)
+          .attr('cy', height1 / 2 - 60)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Shoulder (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        // Ombro Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 20)
+          .attr('cy', height1 / 2 - 60)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Shoulder (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 + 20, height1 / 2 - 60, width1 / 2 - 20, height1 / 2 - 60);
+
+        // Cotovelo Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 40)
+          .attr('cy', height1 / 2 - 20)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Elbow (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 - 40, height1 / 2 - 20, width1 / 2 - 20, height1 / 2 - 60);
+
+        // Cotovelo Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 40)
+          .attr('cy', height1 / 2 - 20)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Elbow (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 + 40, height1 / 2 - 20, width1 / 2 + 20, height1 / 2 - 60);
+
+        // Punho Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 60)
+          .attr('cy', height1 / 2 + 20)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Wrist (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 - 40, height1 / 2 - 20, width1 / 2 - 60, height1 / 2 + 20);
+
+        // Punho Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 60)
+          .attr('cy', height1 / 2 + 20)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Wrist (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 + 40, height1 / 2 - 20, width1 / 2 + 60, height1 / 2 + 20);
+
+        // meio do corpo
+        body.append('circle')
+          .attr('cx', width1 / 2)
+          .attr('cy', height1 / 2 - 20)
+          .attr('r', 10)
+          .attr('id', 'meio')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2, height1 / 2 - 20, width1 / 2, height1 / 2 - 100);
+
+        // meio do corpo
+        body.append('circle')
+          .attr('cx', width1 / 2)
+          .attr('cy', height1 / 2 + 10)
+          .attr('r', 10)
+          .attr('id', 'cintura')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2, height1 / 2 + 10, width1 / 2, height1 / 2 - 100);
+
+        // Quadril Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 20)
+          .attr('cy', height1 / 2 + 40)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Hip (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 - 20, height1 / 2 + 40, width1 / 2, height1 / 2 + 10);
+        // Quadril Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 20)
+          .attr('cy', height1 / 2 + 40)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Hip (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+        drawLine(width1 / 2 + 20, height1 / 2 + 40, width1 / 2, height1 / 2 + 10);
+
+        // Joelho Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 20)
+          .attr('cy', height1 / 2 + 80)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Knee (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+        drawLine(width1 / 2 - 20, height1 / 2 + 80, width1 / 2 - 20, height1 / 2 + 40);
+
+
+        // Joelho Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 20)
+          .attr('cy', height1 / 2 + 80)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Knee (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+        drawLine(width1 / 2 + 20, height1 / 2 + 80, width1 / 2 + 20, height1 / 2 + 40);
+
+        // Tornozelo Esquerdo
+        body.append('circle')
+          .attr('cx', width1 / 2 - 20)
+          .attr('cy', height1 / 2 + 120)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Ankle (Left)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection);
+
+        drawLine(width1 / 2 - 20, height1 / 2 + 120, width1 / 2 - 20, height1 / 2 + 80);
+
+        // Tornozelo Direito
+        body.append('circle')
+          .attr('cx', width1 / 2 + 20)
+          .attr('cy', height1 / 2 + 120)
+          .attr('r', 10)
+          .attr('id', 'Range of Motion Ankle (Right)')
+          .attr('fill', 'gray')
+          .on('click', handleJointSelection)
+
+        drawLine(width1 / 2 + 20, height1 / 2 + 120, width1 / 2 + 20, height1 / 2 + 80);
+
+      })
+      .catch(error => {
+        // Trate possíveis erros
+        console.error(error);
+      });
+
+
+    function selectFile() {
+      const painLevelOptions = [
+        { value: 10, label: 'Insuportável' },
+        { value: 9, label: 'Muito extrema' },
+        { value: 8, label: 'Extrema' },
+        { value: 7, label: 'Muito forte' },
+        { value: 6, label: 'Muito intensa' },
+        { value: 5, label: 'Intensa' },
+        { value: 4, label: 'Considerável' },
+        { value: 3, label: 'Moderada' },
+        { value: 2, label: 'Leve' },
+        { value: 1, label: 'Muito leve' },
+        { value: 0, label: 'Nenhuma' }
+      ];
+
+      const fileInput = document.getElementById('file-input');
+      const painLevelInputsContainer = document.getElementById('pain-level-inputs');
+      const addButton = document.getElementById('add-button');
+      console.log(paciente);
+
+      // Clear existing pain level inputs
+      painLevelInputsContainer.innerHTML = '';
+
+      // Create an input element for file selection
+      const fileSelectionInput = document.createElement('input');
+      fileSelectionInput.type = 'file';
+      fileSelectionInput.accept = '.xls,.xlsx';
+      fileSelectionInput.multiple = true;
+
+      // Handle file selection
+      fileSelectionInput.addEventListener('change', function () {
+        const files = fileSelectionInput.files;
+
+        // Create pain level inputs for each selected file
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+
+          const painLevelLabel = document.createElement('label');
+          painLevelLabel.textContent = `Nível de Dor para o Arquivo ${i + 1}:`;
+          painLevelLabel.style.display = 'block';
+          painLevelLabel.style.marginBottom = '5px';
+          painLevelLabel.style.fontSize = 'x-large'
+
+          const fileNameSpan = document.createElement('span');
+          fileNameSpan.textContent = `(${file.name})`;
+          fileNameSpan.style.fontStyle = 'italic';
+          fileNameSpan.style.marginLeft = '10px';
+          fileNameSpan.style.fontSize = 'x-large'
+
+          const painLevelInput = document.createElement('select');
+          painLevelInput.required = true;
+          painLevelInput.style.marginBottom = '10px';
+          painLevelInput.id = `painLevelInput_${i}`;
+          painLevelInput.classList.add('pain-level-input');
+          painLevelInput.style.fontSize = 'x-large'
+
+
+          // Create options for pain level input
+          painLevelOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.label;
+            painLevelInput.appendChild(optionElement);
+          });
+          painLevelInputsContainer.appendChild(painLevelLabel);
+          painLevelLabel.appendChild(fileNameSpan);
+          painLevelInputsContainer.appendChild(painLevelInput);
+          painLevelInputsContainer.appendChild(document.createElement('br'));
+        }
+        document.getElementById("pain-level-inputs").classList.remove("hide");
+
+        addButton.style.display = 'block';
+
+
+      });
+
+      // Handle button click
+      addButton.addEventListener('click', function () {
+        const files = fileSelectionInput.files;
+
+        const readerPromises = [];
+        const movements = ['Flexão de Cotovelo', 'Extensão de Cotovelo', 'Flexão e Extensão de Joelho', 'Flexão e Extensão da Coluna', 'Inclinação Lateral da Coluna'];
+        // Check if all pain level inputs are filled
+        const allInputsFilled = Array.from(document.getElementsByClassName('pain-level-input')).every(input => input.value !== '');
+
+        // Show or hide the button based on input validation
+        if (allInputsFilled) {
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            readerPromises.push(new Promise((resolve, reject) => {
+              const reader = new FileReader();
+
+              reader.onload = () => {
+                const workbook = XLSX.read(reader.result, { type: 'binary' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const session = {
+                  sessionNumber: parseInt(parseInt(paciente.numSessoes) + i + 1),
+                  movements: [],
+                  painLevel: parseInt(document.getElementById('painLevelInput_' + i).value),
+                };
+                //GAMBIARRA PARA TER VÁRIOS MOVIMENTOS EM UMA SESSÃO, SENDO QUE O QUE DETERMINA O QUE O PACIENTE ESTÁ FAZENDO SERIA O PROJETO DO LUIS GUILHERME
+                const columns = data[0];
+                const numMovements = Math.floor(Math.random() * 5) + 1; // Gera de 1 a 5 movimentos aleatórios
+                for (let z = 0; z < numMovements; z++) {
+                  let randomIndex = Math.floor(Math.random() * movements.length);
+                  let movement = movements[randomIndex];
+                  let movementData = {
+                    movimento: movement,
+                    data: []
+                  };
+                  let frames = [];
+
+                  for (let j = Math.floor((data.length / numMovements) * z) + 1; j < Math.floor((data.length / numMovements) * (z + 1) - 1); j++) {
+                    let rowData = data[j];
+                    //console.log(rowData)
+                    let dados = {};
+                    //console.log(columns);
+                    for (let k = 0; k < columns.length; k++) {
+                      let columnName = columns[k];
+                      let columnValue = rowData[k];
+                      dados[columnName] = columnValue;
+                    }
+
+                    frames.push(dados);
+                  }
+
+                  movementData.data.push(frames);
+                  session.movements.push(movementData);
+                }
+                paciente.sessions.push(session);
+
+                // ... Rest of the code ...
+
+                resolve();
+              };
+
+
+              reader.onerror = () => {
+                reject(new Error('Erro ao ler o arquivo'));
+              };
+
+              reader.readAsBinaryString(file);
+            }));
+          }
+
+          // Wait for all file reading promises to resolve
+          Promise.all(readerPromises)
+            .then(() => {
+              console.log('Todos os arquivos foram lidos com sucesso!');
+              paciente.numSessoes = parseInt(parseInt(paciente.sessions.length));
+              console.log(paciente.numSessoes)
+              paciente.painLevel = paciente.sessions[paciente.sessions.length - 1].painLevel;
+              console.log(paciente.sessions)
+              Swal.fire({
+                title: "Sessões adicionadas",
+                text: "Salve as informações para que seja efetuada a adição de sessões",
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "OK",
+              });
+              // ... Rest of the code ...
+            })
+            .catch(error => {
+              console.error('Erro ao ler os arquivos:', error);
+            });
+        } else {
+          Swal.fire({
+            title: "Nível de dor não inserido",
+            text: "Insira o nível de dor de cada sessão",
+            icon: "warning",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "OK",
+          });
+        }
+
+      });
+      console.log(paciente);
+
+
+      // Simulate a click event on the file input element
+      fileSelectionInput.click();
+    }
+
+    function seasonalDecomposition(data) {
+      const n = data.length;
+      const trend = new Array(n).fill(0);
+      const seasonal = new Array(n).fill(0);
+      const residual = new Array(n).fill(0);
+
+      // Calcular a tendência
+      for (let i = 0; i < n; i++) {
+        trend[i] = (data[i - 1] || data[i + 1] || data[i]) / 3; // Média dos pontos vizinhos
+      }
+
+      // Calcular os componentes sazonais
+      for (let i = 0; i < n; i++) {
+        seasonal[i] = data[i] - trend[i];
+      }
+
+      // Calcular o componente residual
+      for (let i = 0; i < n; i++) {
+        residual[i] = data[i] - seasonal[i] - trend[i];
+      }
+
+      return { trend, seasonal, residual };
+    }
+  </script>
+</body>
+
+</html>

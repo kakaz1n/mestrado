@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+        }
+    
+        .form-container {
+          max-width: 400px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f5f5f5;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+        }
+    
+        .form-container h2 {
+          text-align: center;
+          color: #333;
+        }
+    
+        .form-container label {
+          display: block;
+          margin-bottom: 10px;
+          color: #555;
+        }
+    
+        .form-container input[type="text"],
+        .form-container input[type="number"] {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+    
+        .form-container select {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+    
+        .form-container textarea {
+          width: 100%;
+          height: 80px;
+          padding: 8px;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+    
+        .form-container input[type="submit"] {
+          background-color: #4CAF50;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          float: right;
+        }
+    
+        .form-container input[type="submit"]:hover {
+          background-color: #45a049;
+        }
+
+        .popup {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: #f5f5f5;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          padding: 20px;
+          display: none;
+        }
+      </style>
+  <meta charset="UTF-8">
+  <title>Adicionar Paciente</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Adicionar Paciente</h2>
+
+    <form id="pacienteForm" enctype="multipart/form-data">
+      <label for="name">Nome:</label>
+      <input type="text" id="name" required>
+
+      <label for="age">Idade:</label>
+      <input type="number" id="age" required>
+
+      <label for="gender">Gênero:</label>
+      <select id="gender" required>
+        <option value="masculino">Masculino</option>
+        <option value="feminino">Feminino</option>
+        <option value="outro">Outro</option>
+      </select>
+
+      <label for="clinic">Clínica:</label>
+      <input type="text" id="clinic" required>
+
+      <label for="painLevel">Nível de Dor:</label>
+      <input type="number" id="painLevel" required>
+
+      <label for="symptoms">Sintomas (separados por vírgula):</label>
+      <input type="text" id="symptoms" required>
+
+      <label for="numSessoes">Número de Sessões:</label>
+      <input type="number" id="numSessoes" required>
+
+      <label for="rehabTime">Tempo de Reabilitação (em semanas):</label>
+      <input type="number" id="rehabTime" required>
+
+      <label for="satisfaction">Satisfação (de 1 a 5):</label>
+      <input type="number" id="satisfaction" min="1" max="5" required>
+
+      <label for="sessions">Sessões:</label>
+      <input type="file" id="sessions" multiple accept=".xls, .xlsx">
+
+      <input type="submit" value="Adicionar Paciente">
+    </form>
+  </div>
+
+  <div id="popupSuccess" class="popup" style="background-color: #e1f3d8; color: #3d8b32;">
+    Paciente adicionado com sucesso!
+</div>
+
+<div id="popupError" class="popup" style="background-color: #f8d7da; color: #721c24;">
+    Erro ao adicionar o paciente. Por favor, tente novamente.
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // Função para exibir o pop-up de sucesso
+    function showSuccessPopup() {
+      const popup = document.getElementById('popupSuccess');
+      popup.style.display = 'block';
+  
+      setTimeout(function () {
+        popup.style.display = 'none';
+      }, 3000);
+    }
+  
+    // Função para exibir o pop-up de erro
+    function showErrorPopup() {
+      const popup = document.getElementById('popupError');
+      popup.style.display = 'block';
+  
+      setTimeout(function () {
+        popup.style.display = 'none';
+      }, 3000);
+    }
+  
+    // Evento de submissão do formulário
+    document.getElementById('pacienteForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Evita o envio do formulário
+  
+      // Obtenha os valores dos campos do formulário
+      const name = document.getElementById('name').value;
+      const age = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+      const clinic = document.getElementById('clinic').value;
+      const painLevel = document.getElementById('painLevel').value;
+      const symptoms = document.getElementById('symptoms').value.split(',');
+      const numSessoes = document.getElementById('numSessoes').value;
+      const rehabTime = document.getElementById('rehabTime').value;
+      const satisfaction = document.getElementById('satisfaction').value;
+      const sessions = document.getElementById('sessions').files;
+        const sessionsInput = document.getElementById('sessions');
+
+      // Verifique se arquivos foram selecionados
+      if (sessions.length === 0) {
+        alert('Por favor, selecione um ou mais arquivos.');
+        return;
+      }
+  
+      // Crie o objeto paciente com os valores obtidos
+      const paciente = {
+        name: name,
+        age: age,
+        gender: gender,
+        clinic: clinic,
+        painLevel: painLevel,
+        symptoms: symptoms,
+        numSessoes: numSessoes,
+        rehabTime: rehabTime,
+        satisfaction: satisfaction,
+        sessions: []
+      };
+  
+      // Adicione cada arquivo ao array sessions
+      for (let i = 0; i < sessions.length; i++) {
+        paciente.sessions.push(sessions[i]);
+      }
+      console.log(paciente)
+  
+      // Faça uma solicitação POST ao servidor Node.js para adicionar o paciente
+      axios.post('http://localhost:3000/adicionar-paciente', paciente)
+        .then(function (response) {
+          showSuccessPopup();
+        })
+        .catch(function (error) {
+          showErrorPopup();
+        });
+    });
+  </script>
+  
+  
+  
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Painel Administrativo</title>
+  <style>
+    /* Estilos CSS para a página */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f2f2f2;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .sidebar {
+      flex-basis: 25%;
+      padding-right: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    /* Estilos CSS para os elementos do painel */
+    .info-card {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .info-card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .info-card-content {
+      font-size: 16px;
+    }
+
+    .filter-container {
+      margin-bottom: 20px;
+    }
+
+    .filter-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .filter-input {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .button {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background-color: #555;
+    }
+
+    .chart-container {
+      flex-grow: 1;
+      padding: 10px;
+    }
+
+    .chart {
+      width: 100%;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+
+
+    .histogram-container {
+      width: 100%;
+      height: 300px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .histogram-bar {
+      fill: steelblue;
+    }
+
+    .axis {
+      font-size: 14px;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .selected {
+      fill: #66FF99;
+    }
+
+    .info-card {
+      background-color: #f7f7f7;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .info-card-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .info-value {
+      font-size: 24px;
+      color: #555555;
+      margin-top: 5px;
+    }
+
+    .info-icon {
+      font-size: 32px;
+      color: #555555;
+      margin-right: 10px;
+    }
+
+
+    .satisfaction-icon {
+      color: #555555;
+    }
+
+    .satisfaction-icon--high {
+      color: green;
+    }
+
+    .satisfaction-icon--medium {
+      color: orange;
+    }
+
+    .satisfaction-icon--low {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Painel Administrativo</h1>
+    <button id="openFormButton">Adicionar Paciente</button>
+
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <h2>Filtros</h2>
+      <div class="filter-container" id="filter-container">
+        <label for="clinic-filter" class="filter-label">Clínica:</label>
+        <select id="clinic-filter" class="filter-input">
+          <option value="">Todas</option>
+          <option value="Clinic A">Clinic A</option>
+          <option value="Clinic B">Clinic B</option>
+          <option value="Clinic C">Clinic C</option>
+        </select>
+
+        <label for="age-filter" class="filter-label">Faixa Etária:</label>
+        <select id="age-filter" class="filter-input">
+          <option value="">Todas</option>
+          <option value="20-30">20-30</option>
+          <option value="31-40">31-40</option>
+          <option value="41-50">41-50</option>
+          <option value="51-60">51-60</option>
+        </select>
+
+        <label for="gender-filter" class="filter-label">Gênero:</label>
+        <select id="gender-filter" class="filter-input">
+          <option value="">Todos</option>
+          <option value="Male">Masculino</option>
+          <option value="Female">Feminino</option>
+        </select>
+
+        <button class="button" onclick="applyFilters()">Filtrar</button>
+        <button class="button" onclick="resetFilters()">Limpar Filtros</button>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="info-card">
+        <h2>Informações Gerais</h2>
+        <div class="info-card-content" id="general-info">
+          <div class="info-card">
+            <div class="info-card-header">
+              <i class="fas fa-users info-icon"></i>Total de Pacientes
+            </div>
+            <div class="info-card-content" id="total-patients-info">
+              <p class="info-value">${totalPatients}</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-header">
+              <i class="fas fa-calendar-alt info-icon"></i>Total de Sessões
+            </div>
+            <div class="info-card-content" id="total-sessions-info">
+              <p class="info-value">${totalSessions}</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-header">
+              <i class="fas fa-clock info-icon"></i>Tempo Médio de Reabilitação
+            </div>
+            <div class="info-card-content" id="avg-rehab-time-info">
+              <p class="info-value">${avgRehabTime.toFixed(1)} meses</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-header" id="avg-satisfaction-info">
+              <i class="fas fa-smile info-icon"></i>Satisfação Média dos Pacientes
+            </div>
+            <div class="info-card-content">
+              <p class="info-value">${avgSatisfaction.toFixed(1)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h2 style="text-align: center;">Níveis de dor dos pacientes</h2>
+        <div class="info-card-content">
+          <div class="chart" id="pain-pie"></div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h2 style="text-align: center;">Dados Qualitativos</h2>
+        <div class="info-card-content">
+          <div class="chart" id="symptoms-treemap"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="info-card">
+        <h2>Faixa Etária</h2>
+        <div class="info-card-content">
+          <div class="chart" id="age-histogram"></div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h2>Satisfação</h2>
+        <div class="info-card-content">
+          <div class="chart" id="satisfaction-histogram"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="patients-list"></div>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <script>
+    var openFormButton = document.getElementById('openFormButton');
+  
+    openFormButton.addEventListener('click', function() {
+      // Configura as opções para a janela pop-up
+      var windowFeatures = 'width=600,height=400,scrollbars=yes';
+  
+      // Abre o formulário como uma janela pop-up
+      window.open('formulario.html', '_blank', windowFeatures);
+    });
+  </script>
+  
+  
+  <script>
+
+    function generateMovements() {
+      const movements = ['Marcha estácionária', 'Abdominal', 'Sentar e levantar', 'Afundo', 'Flexão'];
+
+      const numMovements = Math.floor(Math.random() * 5) + 1; // Gera de 1 a 5 movimentos aleatórios
+      const selectedMovements = [];
+
+      for (let i = 0; i < numMovements; i++) {
+        const randomIndex = Math.floor(Math.random() * movements.length);
+        const movement = movements[randomIndex];
+
+        // Gerar dados de ROM para cada junta do movimento
+        const movementsData = {
+          movimento: movement,
+          data: generateFrames(200)
+        };
+
+        selectedMovements.push(movementsData);
+      }
+
+      return selectedMovements;
+    }
+
+
+    function generateFrames(numFrames) {
+      const frames = [];
+      for (let frame = 1; frame <= numFrames; frame++) {
+        frames.push(generateFrame(frame));
+      }
+      return frames;
+    }
+
+    function generateFrame(frame) {
+      return {
+        frame,
+        shoulderLeft: getRandomRangeOfMotion(),
+        shoulderRight: getRandomRangeOfMotion(),
+        elbowLeft: getRandomRangeOfMotion(),
+        elbowRight: getRandomRangeOfMotion(),
+        wristLeft: getRandomRangeOfMotion(),
+        wristRight: getRandomRangeOfMotion(),
+        hipLeft: getRandomRangeOfMotion(),
+        hipRight: getRandomRangeOfMotion(),
+        kneeLeft: getRandomRangeOfMotion(),
+        kneeRight: getRandomRangeOfMotion(),
+        ankleLeft: getRandomRangeOfMotion(),
+        ankleRight: getRandomRangeOfMotion()
+      };
+    }
+
+    function getRandomRangeOfMotion() {
+      // Gere um valor aleatório para a amplitude de movimento (ROM)
+      // Pode ser qualquer lógica adequada para gerar valores aleatórios dentro do seu intervalo desejado
+      return Math.random() * (30 - 10) + 10; // Exemplo: ROM varia de 10 a 30
+    }
+
+
+
+    // Função para gerar pacientes fictícios
+    function generatePatients(numPatients) {
+      const patients = [];
+      const genders = ['Male', 'Female'];
+      const clinics = ['Clinic A', 'Clinic B', 'Clinic C'];
+      const painLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+      for (let i = 0; i < numPatients; i++) {
+        const patient = {
+          id: i + 1,
+          name: `Patient ${i + 1}`,
+          age: Math.floor(Math.random() * 40) + 20, // Random age between 20 and 60
+          gender: genders[Math.floor(Math.random() * genders.length)],
+          clinic: clinics[Math.floor(Math.random() * clinics.length)],
+          painLevel: 0, //painLevels[Math.floor(Math.random() * painLevels.length)],
+          symptoms: generateSymptoms(),
+          num_sessoes: Math.floor(Math.random() * 15) + 5,
+          rehabTime: Math.floor(Math.random() * 2),
+          satisfaction: Math.floor(Math.random() * 11),
+          sessions: []
+        };
+
+        const numSessions = patient.num_sessoes;
+        for (let j = 0; j < numSessions; j++) {
+          const session = {
+            sessionNumber: j + 1,
+            movements: generateMovements(), // Função para gerar movimentos aleatórios
+            painLevel: painLevels[Math.floor(Math.random() * painLevels.length)],
+            // Outras informações da sessão
+          };
+
+          patient.sessions.push(session);
+        }
+        patient.painLevel = patient.sessions[numSessions - 1].painLevel;
+        patients.push(patient);
+      }
+
+      return patients;
+    }
+
+    // Função para gerar sintomas fictícios
+    function generateSymptoms() {
+      const symptoms = ['Dor de cabeça', 'Dor no joelho', 'Dor no pé', 'Dor no pescoço', 'Dor na lombar', 'Dor nos braços','Tontura','Falta de equilibrio'];
+      const numSymptoms = Math.floor(Math.random() * 5) + 1; // Random number of symptoms between 1 and 5
+      const selectedSymptoms = [];
+
+      for (let i = 0; i < numSymptoms; i++) {
+        const symptom = symptoms[Math.floor(Math.random() * symptoms.length)];
+        selectedSymptoms.push(symptom);
+      }
+
+      return selectedSymptoms;
+    }
+
+    // Variáveis globais
+    let patientsData = [];
+    let filteredData = [];
+
+    // Gerar pacientes fictícios
+    patientsData = generatePatients(100);
+    filteredData = patientsData;
+
+
+    // Crie a div para exibir a lista de pacientes
+    const patientListDiv = document.createElement('div');
+    patientListDiv.setAttribute('id', 'patient-list');
+
+    // Localize o elemento dos filtros
+    const filtersDiv = document.getElementById('filter-container');
+
+    // Insira a div da lista de pacientes abaixo dos filtros
+    filtersDiv.insertAdjacentElement('afterend', patientListDiv);
+
+    // Função para atualizar a lista de pacientes
+    function updatePatientList(patients) {
+      // Limpa a lista existente
+      patientListDiv.innerHTML = '';
+
+      // Cria um elemento <ul> para a lista de pacientes
+      const ul = document.createElement('ul');
+
+      // Percorre os pacientes e cria um item de lista para cada um
+      patients.forEach((patient) => {
+        // Cria um elemento <li> para cada paciente
+        const li = document.createElement('li');
+        li.style.listStyleType = 'none';
+
+        // Define o conteúdo do item de lista com as informações do paciente
+        li.textContent = `ID: ${patient.id}, ${patient.clinic}, ${patient.gender}`;
+
+        li.addEventListener('click', () => {
+          // Armazena os dados do paciente no localStorage
+          localStorage.setItem('patientData', JSON.stringify(patientsData[patient.id - 1]));
+          // Redireciona para a página específica do paciente
+          window.location.href = `patient.html`;
+        });
+        // Adiciona o item de lista ao <ul>
+        ul.appendChild(li);
+      });
+
+      // Adiciona o <ul> à div de lista de pacientes
+      patientListDiv.appendChild(ul);
+      // Define a altura máxima e habilita a rolagem
+      patientListDiv.style.maxHeight = '200px';
+      patientListDiv.style.overflow = 'auto';
+    }
+    updatePatientList(filteredData);
+
+    var totalPatients = 0;
+    var totalSessions = 0;
+    var avgRehabTime = 0;
+    var avgSatisfaction = 0;
+    // Atualizar informações gerais
+    function updateGeneralInfo() {
+      totalPatients = filteredData.length;
+      totalSessions = filteredData.reduce((total, patient) => total + patient.num_sessoes, 0);
+      avgRehabTime = filteredData.reduce((total, patient) => total + patient.rehabTime, 0) / totalPatients;
+      avgSatisfaction = filteredData.reduce((total, patient) => total + patient.satisfaction, 0) / totalPatients;
+
+      document.getElementById('general-info').innerHTML = `      
+        <div class="info-card">
+          <div class="info-card-header"><i class="fas fa-users info-icon"></i>Total de Pacientes</div>
+          <div class="info-card-content" id="total-patients-info">
+            <p class="info-value">${totalPatients}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header"><i class="fas fa-calendar-alt info-icon"></i>Total de Sessões</div>
+          <div class="info-card-content" id="total-sessions-info">
+            <p class="info-value">${totalSessions}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header"><i class="fas fa-clock info-icon"></i>Tempo Médio de Reabilitação</div>
+          <div class="info-card-content" id="avg-rehab-time-info">
+            <p class="info-value">${avgRehabTime.toFixed(1)} meses</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header" id="avg-satisfaction-info"><i class="fas fa-smile info-icon"></i>Satisfação Média dos Pacientes</div>
+          <div class="info-card-content" >
+            <p class="info-value">${avgSatisfaction.toFixed(1)}</p>
+          </div>
+        </div>
+        `;
+
+
+        const satisfactionInfo = document.querySelector("#avg-satisfaction-info");
+        console.log(satisfactionInfo)
+        console.log(avgSatisfaction)
+        if (satisfactionInfo) {
+          const satisfactionIcon = satisfactionInfo.querySelector(".info-icon");
+          if (avgSatisfaction >= 7) {
+            satisfactionIcon.classList.add("satisfaction-icon--high");
+          } else if (avgSatisfaction >= 5) {
+            satisfactionIcon.classList.add("satisfaction-icon--medium");
+          } else {
+            satisfactionIcon.classList.add("satisfaction-icon--low");
+          }
+        }
+    }
+
+
+
+    // Atualizar gráfico de pizza de dor
+    function updatePainPieChart() {
+      const painData = filteredData.reduce((data, patient) => {
+        data[patient.painLevel] = (data[patient.painLevel] || 0) + 1;
+        return data;
+      }, {});
+
+      const pieData = Object.entries(painData).map(([level, count]) => ({ level, count }));
+
+      const legendData = [
+      { painLevel: 10, color: "#FF3333", text: "Dor máxima" },
+      { painLevel: 9, color: "#FF9999", text: "Dor muito forte" },
+      { painLevel: 8, color: "#FF9933", text: "Dor muito forte" },
+      { painLevel: 7, color: "#FFCC99", text: "Dor forte" },
+      { painLevel: 6, color: "#FFFF33", text: "Dor forte" },
+      { painLevel: 5, color: "#FFFF99", text: "Dor moderada" },
+      { painLevel: 4, color: "#33FF77", text: "Dor moderada" },
+      { painLevel: 3, color: "#B3FFCC", text: "Dor suave" },
+      { painLevel: 2, color: "#66B3FF", text: "Dor suave" },
+      { painLevel: 1, color: "#D6E9FF", text: "Sem dor" }
+    ];
+      const colorScale = d3.scaleOrdinal()
+        .domain(pieData.map(d => d.level))
+        .range(['#FF3333', '#FF9999', '#FF9933', '#FFCC99', '#FFFF33', '#FFFF99', '#33FF77', '#B3FFCC', '#66B3FF', '#D6E9FF']);
+      const width = 450;
+      const height = 300;
+      const radius = Math.min(width, height) / 2;
+
+
+      const pie = d3.pie()
+        .value(d => d.count)
+        .sort(null);
+
+      const arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+      const svg = d3.select('#pain-pie')
+        .html('')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+      const arcs = svg.selectAll('arc')
+        .data(pie(pieData))
+        .enter()
+        .append('g')
+        .attr('class', 'arc');
+
+      arcs.append('path')
+        .attr('d', arc)
+        .attr('fill', d => {
+          console.log(d.data.level);
+          if (d.data.level == 10) return '#FF3333';
+          if (d.data.level == 9) return '#FF9999';
+          if (d.data.level == 8) return '#FF9933';
+          if (d.data.level == 7) return '#FFCC99';
+          if (d.data.level == 6) return '#FFFF33';
+          if (d.data.level == 5) return '#FFFF99';
+          if (d.data.level == 4) return '#33FF77';
+          if (d.data.level == 3) return '#B3FFCC';
+          if (d.data.level == 2) return '#66B3FF';
+          if (d.data.level == 1) return '#D6E9FF';
+        })
+        .attr('stroke', '#ffffff') // Cor do contorno dos slices
+        .attr('stroke-width', 0.3); // Espessura do contorno dos slices
+
+      /* arcs.append('text')
+        .attr('transform', d => `translate(${arc.centroid(d)})`)
+        .attr('dy', '0.35em')
+        .text(d => d.data.level);*/
+
+      // Escala de cores
+      const legend = svg.append('g')
+        .attr('transform', `translate(${radius + 20}, 0)`);
+
+        const colorLegend = legend.selectAll('.color-legend')
+  .data(pieData)
+  .enter()
+  .append('g')
+  .attr('class', 'color-legend')
+  .attr('transform', (d, i) => `translate(0, ${i * 25})`); // Ajuste o valor de 25 para controlar o espaçamento vertical
+
+colorLegend.append('rect')
+  .attr('width', 10)
+  .attr('height', 10)
+  .attr('fill', d => colorScale(d.level));
+
+colorLegend.append('text')
+  .attr('x', 15)
+  .attr('y', 5) // Ajuste o valor de 5 para posicionar verticalmente o texto corretamente
+  .text(d => {
+    if (d.level === 10) return 'Dor máxima';
+    if (d.level === 9) return 'Dor muito forte';
+    if (d.level === 8) return 'Dor muito forte';
+    if (d.level === 7) return 'Dor forte';
+    if (d.level === 6) return 'Dor forte';
+    if (d.level === 5) return 'Dor moderada';
+    if (d.level === 4) return 'Dor moderada';
+    if (d.level === 3) return 'Dor suave';
+    if (d.level === 2) return 'Dor suave';
+    if (d.level === 1) return 'Sem dor';
+  });
+
+      
+
+    }
+    let sintomas_selecionados = [];
+    // Atualizar gráfico de treemap de sintomas
+    function updateSymptomsTreemapChart() {
+      pacientes = filteredData;
+      const symptomsData = filteredData.reduce((data, patient) => {
+        patient.symptoms.forEach(symptom => {
+          data[symptom] = (data[symptom] || 0) + 1;
+        });
+        return data;
+      }, {});
+
+      const treemapData = {
+        name: 'Symptoms',
+        children: Object.entries(symptomsData).map(([symptom, count]) => ({ name: symptom, count })),
+      };
+
+      const width = 300;
+      const height = 300;
+
+      const colorScale = d3.scaleOrdinal()
+        .domain(treemapData.children.map(d => d.name))
+        .range(d3.schemeCategory10);
+
+      const treemap = d3.treemap()
+        .size([width, height])
+        .padding(1)
+        .round(true);
+
+      const root = d3.hierarchy(treemapData)
+        .sum(d => d.count)
+        .sort((a, b) => b.count - a.count);
+
+      treemap(root);
+
+      const svg = d3.select('#symptoms-treemap')
+        .html('')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      const cell = svg.selectAll('g')
+        .data(root.leaves())
+        .enter()
+        .append('g')
+        .attr('transform', d => `translate(${d.x0}, ${d.y0})`)
+        .on('click', handleClick); // Adiciona evento de clique
+
+      cell.append('rect')
+        .attr('width', d => d.x1 - d.x0)
+        .attr('height', d => d.y1 - d.y0)
+        .attr('fill', d => colorScale(d.data.name));
+
+      cell.append('text')
+        .attr('x', 5)
+        .attr('y', 15)
+        .text(d => d.data.name);
+
+      // Função de tratamento de clique
+      function handleClick() {
+        // Alternar classe "selected" para o retângulo clicado
+        d3.select(this).select('rect').classed('selected', !d3.select(this).select('rect').classed('selected'));
+        const selectedSymptoms = Array.from(document.querySelectorAll('.selected')).map(el => el.__data__.data.name);
+        console.log(selectedSymptoms)
+        // Filtrar os dados com base nos sintomas selecionados
+        const filteredDataBySymptoms = pacientes.filter(patient => selectedSymptoms.every(symptom => patient.symptoms.includes(symptom)));
+        if (filteredDataBySymptoms.length) {
+          filteredData = filteredDataBySymptoms;
+          console.log("Filtrado :")
+          console.log(filteredData)
+        }
+        else {
+          filteredData = pacientes;
+        }
+
+        // Chamar as funções de atualização dos outros gráficos com os dados filtrados
+        updateSatisfactionChart();
+        updateAgeHistogramChart();
+        updateGeneralInfo();
+        updatePainPieChart();
+        updatePatientList(filteredData);
+
+
+      }
+    }
+
+
+
+
+    // Atualizar gráfico de histograma de faixa etária
+    function updateAgeHistogramChart() {
+      const ageData = filteredData.map(patient => patient.age);
+
+      const width = 300;
+      const height = 300;
+      const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+      const histogramWidth = width - margin.left - margin.right;
+      const histogramHeight = height - margin.top - margin.bottom;
+
+      const x = d3.scaleLinear()
+        .domain([20, 60])
+        .range([0, histogramWidth]);
+
+      const bins = d3.histogram()
+        .domain(x.domain())
+        .thresholds(x.ticks(10))
+        (ageData);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(bins, d => d.length)])
+        .range([histogramHeight, 0]);
+
+      const xAxis = d3.axisBottom(x);
+      const yAxis = d3.axisLeft(y);
+
+
+
+
+      const svg = d3.select('#age-histogram')
+        .html('')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+      svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(0, ${histogramHeight})`)
+        .call(xAxis);
+
+      svg.append('g')
+        .attr('class', 'y-axis')
+        .call(yAxis);
+
+      svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - (histogramHeight / 2))
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Quantidade');
+
+
+      svg.selectAll('rect')
+        .data(bins)
+        .enter()
+        .append('rect')
+        .attr('x', 1)
+        .attr('transform', d => `translate(${x(d.x0)}, ${y(d.length)})`)
+        .attr('width', d => x(d.x1) - x(d.x0) - 1)
+        .attr('height', d => histogramHeight - y(d.length))
+        .attr('fill', 'steelblue');
+    }
+
+    // Atualizar gráfico de satisfação dos pacientes
+    function updateSatisfactionChart() {
+
+      const satisfactionData = filteredData.map(patient => patient.satisfaction);
+
+      const width = 300;
+      const height = 300;
+      const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+      const histogramWidth = width - margin.left - margin.right;
+      const histogramHeight = height - margin.top - margin.bottom;
+
+      const x = d3.scaleLinear()
+        .domain([0, 10])
+        .range([0, histogramWidth]);
+
+      const bins = d3.histogram()
+        .domain(x.domain())
+        .thresholds(x.ticks(10))
+        (satisfactionData);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(bins, d => d.length)])
+        .range([histogramHeight, 0]);
+
+      const xAxis = d3.axisBottom(x);
+
+
+
+      const svg = d3.select('#satisfaction-histogram')
+        .html('')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+      const yAxis = d3.axisLeft(y);
+
+      svg.append('g')
+        .attr('class', 'y-axis')
+        .call(yAxis);
+
+
+      svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(0, ${histogramHeight})`)
+        .call(xAxis);
+
+      svg.selectAll('rect')
+        .data(bins)
+        .enter()
+        .append('rect')
+        .attr('x', 1)
+        .attr('transform', d => `translate(${x(d.x0)}, ${y(d.length)})`)
+        .attr('width', d => x(d.x1) - x(d.x0) - 1)
+        .attr('height', d => histogramHeight - y(d.length))
+        .attr('fill', 'steelblue');
+
+      svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - (histogramHeight / 2))
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Quantidade');
+
+    }
+
+
+    // Função para aplicar os filtros
+    function applyFilters() {
+      const clinicFilter = document.getElementById('clinic-filter').value;
+      const ageFilter = document.getElementById('age-filter').value;
+      const genderFilter = document.getElementById('gender-filter').value;
+
+      filteredData = patientsData.filter(patient =>
+        (clinicFilter === '' || patient.clinic === clinicFilter) &&
+        (ageFilter === '' || ageFilter === '20-30' && patient.age >= 20 && patient.age <= 30 ||
+          ageFilter === '31-40' && patient.age >= 31 && patient.age <= 40 ||
+          ageFilter === '41-50' && patient.age >= 41 && patient.age <= 50 ||
+          ageFilter === '51-60' && patient.age >= 51 && patient.age <= 60) &&
+        (genderFilter === '' || patient.gender === genderFilter)
+      );
+
+      updateGeneralInfo();
+      updatePainPieChart();
+      updateSymptomsTreemapChart();
+      updateAgeHistogramChart();
+      updateSatisfactionChart();
+      updatePatientList(filteredData);
+
+    }
+
+    // Função para resetar os filtros
+    function resetFilters() {
+      document.getElementById('clinic-filter').value = '';
+      document.getElementById('age-filter').value = '';
+      document.getElementById('gender-filter').value = '';
+
+      filteredData = patientsData;
+
+      updateGeneralInfo();
+      updatePainPieChart();
+      updateSymptomsTreemapChart();
+      updateAgeHistogramChart();
+      updateSatisfactionChart();
+      updatePatientList(filteredData);
+
+    }
+
+
+    // Inicializar gráficos
+    updateGeneralInfo();
+    updatePainPieChart();
+    updateSymptomsTreemapChart();
+    updateAgeHistogramChart();
+    updateSatisfactionChart();
+
+  </script>
+</body>
+
+</html>

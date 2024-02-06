@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Página do Paciente</title>
+  <style>
+    /* Estilos CSS para a página */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f2f2f2;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* Estilos CSS para os elementos da página */
+    .patient-details {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .patient-details-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .patient-details-content {
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Página do Paciente</h1>
+  </header>
+
+  <div class="container">
+    <div class="patient-details">
+      <h2>Dados do Paciente</h2>
+      <div class="patient-details-content">
+        <p><span class="patient-details-title">Nome:</span> <span id="patient-name">Paciente 1</span></p>
+        <p><span class="patient-details-title">Número de Identificação:</span> <span id="patient-id">1</span></p>
+        <p><span class="patient-details-title">Idade:</span> <span id="patient-age">35 anos</span></p>
+        <!-- Adicione mais informações do paciente aqui -->
+      </div>
+    </div>
+
+    <!-- Adicione mais seções de informações do paciente aqui -->
+  </div>
+
+  <script>
+    // Dados fictícios do paciente
+    const patient = {
+      id: 1,
+      name: "Paciente 1",
+      age: 35,
+      // Adicione mais informações do paciente aqui
+    };
+
+    // Função para atualizar as informações do paciente
+    function updatePatientDetails() {
+      const patientName = document.querySelector("#patient-name");
+      const patientId = document.querySelector("#patient-id");
+      const patientAge = document.querySelector("#patient-age");
+
+      patientName.textContent = patient.name;
+      patientId.textContent = patient.id.toString();
+      patientAge.textContent = patient.age.toString() + " anos";
+
+      // Atualize as outras informações do paciente aqui
+    }
+
+    // Função de inicialização
+    function init() {
+      updatePatientDetails();
+    }
+
+    init();
+  </script>
+</body>
+</html>

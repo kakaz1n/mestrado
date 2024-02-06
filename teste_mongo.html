@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Estilos CSS para a página */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 0;
+            padding-top: -10px;
+            height: 50px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 2000px;
+            margin: 45px;
+            padding: 10px;
+            padding-top: 30px;
+            background-color: #f2f2f2;
+            box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            padding-left: 30px;
+        }
+
+        .sidebar {
+            flex-basis: 25%;
+            padding-right: 20px;
+            max-height: 880px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        /* Estilos CSS para os elementos do painel */
+        .info-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            display: block;
+        }
+
+        .info-card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-card-content {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
+
+        .chart-container {
+            flex-grow: 1;
+            /*width: 400px;*/
+            padding-right: 20px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+
+        .histogram-container {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .histogram-bar {
+            fill: steelblue;
+        }
+
+        .axis {
+            font-size: 14px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .selected {
+            fill: #66FF99;
+        }
+
+        .info-card-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            color: #555555;
+            margin-top: 5px;
+        }
+
+        .info-icon {
+            font-size: 32px;
+            color: #555555;
+            margin-right: 10px;
+        }
+
+
+        .satisfaction-icon {
+            color: #555555;
+        }
+
+        .add-patient {
+            color: green;
+
+        }
+
+        .satisfaction-icon--high {
+            color: green;
+        }
+
+        .satisfaction-icon--medium {
+            color: orange;
+        }
+
+        .satisfaction-icon--low {
+            color: red;
+        }
+
+        .patient-list {
+            max-height: 380px;
+            padding-bottom: 35px;
+        }
+
+        .patient-list-ul {
+            list-style-type: none;
+            padding: 0;
+            overflow-y: auto;
+            height: 390px;
+        }
+
+        .patient-list-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .patient-list-item:hover {
+            background-color: #C0C0C0;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .patient-id {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .patient-clinic,
+        .patient-gender {
+            color: #666;
+        }
+
+        #openFormButton {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 style="
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding-top: 10px;
+    ">Painel Administrativo</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <div class="info-card">
+                <h2>Filtros</h2>
+                <div class="filter-container" id="filter-container">
+                    <label for="clinic-filter" class="filter-label">Clínica:</label>
+                    <select id="clinic-filter" class="filter-input">
+                        <option value="">Todas</option>
+                    </select>
+
+                    <label for="age-filter" class="filter-label">Faixa Etária:</label>
+                    <select id="age-filter" class="filter-input">
+                        <option value="">Todas</option>
+                        <option value="20-30">20-30</option>
+                        <option value="31-40">31-40</option>
+                        <option value="41-50">41-50</option>
+                        <option value="51-60">51-60</option>
+                    </select>
+
+                    <label for="gender-filter" class="filter-label">Gênero:</label>
+                    <select id="gender-filter" class="filter-input">
+                        <option value="">Todos</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                    </select>
+
+                    <button class="button" onclick="applyFilters(1)">Filtrar</button>
+                    <button class="button" onclick="resetFilters()">Limpar Filtros</button>
+                </div>
+            </div>
+            <div class="info-card">
+                <div id="pacientes">
+                    <h2> Pacientes</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="info-card" style="height: 840px; width: 430px;">
+                <h2>Informações Gerais</h2>
+                <div class="info-card-content" id="general-info">
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-users info-icon"></i>Total de Pacientes
+                        </div>
+                        <div class="info-card-content" id="total-patients-info">
+                            <p class="info-value">${totalPatients}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-calendar-alt info-icon"></i>Total de Sessões
+                        </div>
+                        <div class="info-card-content" id="total-sessions-info">
+                            <p class="info-value">${totalSessions}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-clock info-icon"></i>Tempo Médio de Reabilitação
+                        </div>
+                        <div class="info-card-content" id="avg-rehab-time-info">
+                            <p class="info-value">${avgRehabTime.toFixed(1)} meses</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header" id="avg-satisfaction-info">
+                            <i class="fas fa-smile info-icon"></i>Satisfação Média dos Pacientes
+                        </div>
+                        <div class="info-card-content">
+                            <p class="info-value">${avgSatisfaction.toFixed(1)}</p>
+                        </div>
+                    </div>
+                    <div class="info-card" id="add-patient-info">
+                        <div class="info-card-header">
+                            <i class="fas fa-user-plus info-icon" class="add-patient"></i>Adicionar Paciente
+                        </div>
+                        <div class="info-card-content">
+                            <button id="openFormButton">Adicionar Paciente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="info-card" style="width: 350px;">
+                <h2>Distribuição etária</h2>
+                <div class="info-card-content">
+                    <div class="chart" id="age-histogram"></div>
+                </div>
+            </div>
+            <div class="info-card" style="width: 350px;">
+                <h2>Satisfação</h2>
+                <div class="info-card-content">
+                    <div class="chart" id="satisfaction-histogram"></div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="info-card" style="width: 500px;">
+                <h2 style="text-align: center;">Níveis de dor</h2>
+                <div class="info-card-content">
+                    <div class="chart" id="pain-pie"></div>
+                </div>
+            </div>
+            <div class="info-card" style="width: 500px;">
+                <h2 style="text-align: center;">Distribuição dos sintomas</h2>
+                <div class="info-card-content">
+                    <div class="chart" id="symptoms-treemap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+
+    <script>
+        async function generatePatientsFromDB() {
+            try {
+                const response = await axios.get('http://localhost:3000/pacientes');
+                const patients = response.data;
+                return patients;
+            } catch (error) {
+                console.error('Erro ao buscar pacientes:', error);
+                return [];
+            }
+        }
+
+
+        var pacientes_teste = generatePatientsFromDB();
+        console.log(pacientes_teste)
+    </script>
+
+    <script>
+        async function generateClinicsFromDB() {
+            try {
+                const response = await axios.get('http://localhost:3000/clinicas');
+                const clinicas = response.data;
+                //return clinicas;
+                const clinicSelect = document.getElementById('clinic-filter');
+                console.log(clinicas);
+                const clinicas_ordenadas = clinicas.sort((a, b) => a.clinica.localeCompare(b.clinica));
+                // Crie as opções dinamicamente com base nos dados retornados
+                clinicas_ordenadas.forEach(clinica => {
+                    const option = document.createElement('option');
+                    option.value = clinica.clinica;
+                    option.textContent = clinica.clinica;
+                    clinicSelect.appendChild(option);
+                });
+
+
+            } catch (error) {
+                console.error('Erro ao buscar clinicas:', error);
+                return [];
+            }
+        }
+
+
+        generateClinicsFromDB();
+    </script>
+
+
+
+
+
+    <script>
+
+        // Variáveis globais
+        //let patientsData = [];
+        let filteredData = [];
+
+        // Gerar pacientes fictícios
+        const patientsData = generatePatientsFromDB();
+
+        filteredData = patientsData;
+        console.log(filteredData)
+
+        // Crie a div para exibir a lista de pacientes
+        const patientListDiv = document.createElement('div');
+        patientListDiv.setAttribute('id', 'patient-list');
+        patientListDiv.setAttribute('class', 'patient-list');
+
+        // Localize o elemento dos filtros
+        const pacientesDiv = document.getElementById('pacientes');
+
+        // Insira a div da lista de pacientes abaixo dos filtros
+        pacientesDiv.insertAdjacentElement('afterend', patientListDiv);
+
+        // Função para atualizar a lista de pacientes
+        async function updatePatientList(filtrado) {
+            try {
+                // Recupera os dados dos pacientes do MongoDB
+                const response = await fetch('/pacientes');
+                let patients = await response.json();
+                if (filtrado) patients = filteredData;
+                // Limpa a lista existente
+                patients = patients.reverse();
+                patientListDiv.innerHTML = '';
+
+                // Cria um elemento <ul> para a lista de pacientes
+                const ul = document.createElement('ul');
+                ul.classList.add('patient-list-ul');
+
+                // Percorre os pacientes e cria um item de lista para cada um
+                patients.forEach((patient) => {
+                    // Cria um elemento <li> para cada paciente
+                    const li = document.createElement('li');
+                    li.classList.add('patient-list-item');
+
+                    // Define o conteúdo do item de lista com as informações do paciente
+                    li.innerHTML = `
+                        <div class="patient-info">
+
+                        <span class="patient-id">${patient.name}</span>
+                        <span class="patient-clinic">${patient.clinic}</span>
+                        <span class="patient-age">${patient.age}</span>
+                        </div>
+                    `;
+
+                    li.addEventListener('click', () => {
+                        // Armazena os dados do paciente no localStorage
+                        localStorage.setItem('patientData', JSON.stringify(patient._id));
+                        // Redireciona para a página específica do paciente
+                        window.location.href = `patient.html`;
+                    });
+
+                    // Adiciona o item de lista ao <ul>
+                    ul.appendChild(li);
+                });
+
+                // Adiciona o <ul> à div de lista de pacientes
+                patientListDiv.appendChild(ul);
+            } catch (error) {
+                console.error('Erro ao buscar pacientes:', error);
+            }
+        }
+
+
+
+
+        // Chame a função para atualizar a lista de pacientes
+        updatePatientList();
+
+
+        // Atualizar informações gerais
+        async function updateGeneralInfo(filtrado) {
+            try {
+                // Recupera os dados dos pacientes do MongoDB
+                const response = await fetch('/pacientes');
+                var patients = await response.json();
+                if (filtrado) patients = filteredData;
+                totalPatients = patients.length;
+                console.log(patients)
+                totalSessions = patients.reduce((total, patient) => total + patient.numSessoes, 0);
+                avgRehabTime = patients.reduce((total, patient) => total + patient.rehabTime, 0) / totalPatients;
+                avgSatisfaction = patients.reduce((total, patient) => total + patient.satisfaction, 0) / totalPatients;
+
+                document.getElementById('general-info').innerHTML = `      
+      <div class="info-card">
+        <div class="info-card-header"><i class="fas fa-users info-icon"></i>Total de Pacientes</div>
+        <div class="info-card-content" id="total-patients-info">
+          <p class="info-value">${totalPatients}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header"><i class="fas fa-calendar-alt info-icon"></i>Total de Sessões</div>
+        <div class="info-card-content" id="total-sessions-info">
+          <p class="info-value">${totalSessions}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header"><i class="fas fa-clock info-icon"></i>Tempo Médio de Reabilitação</div>
+        <div class="info-card-content" id="avg-rehab-time-info">
+          <p class="info-value">${avgRehabTime.toFixed(1)} meses</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header" id="avg-satisfaction-info"><i class="fas fa-smile info-icon"></i>Satisfação Média dos Pacientes</div>
+        <div class="info-card-content" >
+          <p class="info-value">${avgSatisfaction.toFixed(1)}</p>
+        </div>
+      </div>
+      <div class="info-card" id="add-patient-info">
+                        <div class="info-card-header" >
+                            <i class="fas fa-user-plus info-icon" class="add-patient"></i>Adicionar Paciente
+                        </div>
+                        <div class="info-card-content">
+                            <button id="openFormButton">Adicionar Paciente</button>
+                        </div>
+                    </div>
+    `;
+
+                const satisfactionInfo = document.querySelector("#avg-satisfaction-info");
+
+                if (satisfactionInfo) {
+                    const satisfactionIcon = satisfactionInfo.querySelector(".info-icon");
+                    if (avgSatisfaction >= 7) {
+                        satisfactionIcon.classList.add("satisfaction-icon--high");
+                    } else if (avgSatisfaction >= 5) {
+                        satisfactionIcon.classList.add("satisfaction-icon--medium");
+                    } else {
+                        satisfactionIcon.classList.add("satisfaction-icon--low");
+                    }
+                }
+
+                var openFormButton = document.getElementById('openFormButton');
+
+                openFormButton.onclick = function () {
+                    // Configura as opções para a janela pop-up
+                    var windowFeatures = 'width=600,height=750,scrollbars=yes';
+
+                    // Abre o formulário como uma janela pop-up
+                    window.open('formulario.html', '_blank', windowFeatures);
+                };
+            } catch (error) {
+                // Trate qualquer erro de recuperação de dados do MongoDB
+                console.log(error);
+            }
+        }
+
+        function executarAposFechar() {
+            // Faça o que deseja aqui
+            updateSatisfactionChart();
+            updateAgeHistogramChart();
+            updateGeneralInfo();
+            updatePainPieChart();
+            updatePatientList();
+            updateSymptomsTreemapChart();
+
+            Swal.fire({
+                title: "Atualizando informações",
+                icon: "info",
+                timer: 20000, // Tempo em milissegundos (2 segundos)
+                timerProgressBar: true,
+                allowOutsideClick: false, // Impede o usuário de clicar fora do modal
+                backdrop: true,
+                showConfirmButton: false, // Remove o botão de confirmação
+            });
+
+            // Aguarda o tempo definido no timer antes de fechar o modal
+            setTimeout(function () {
+                Swal.close(); // Fecha o modal
+                // Aqui você pode realizar outras ações após o fechamento do modal
+            }, 20000); // Tempo em milissegundos (2 segundos)
+
+        }
+
+        // Chame a função para atualizar as informações gerais
+        //updateGeneralInfo();
+
+
+
+
+        // Atualizar gráfico de pizza de dor
+        async function updatePainPieChart(filtrado) {
+            try {
+                // Recupera os dados dos pacientes do MongoDB
+                const response = await fetch('/pacientes');
+                let patients = await response.json();
+                if (filtrado) patients = filteredData
+                const painData = patients.reduce((data, patient) => {
+                    data[patient.painLevel] = (data[patient.painLevel] || 0) + 1;
+                    return data;
+                }, {});
+
+                const pieData = Object.entries(painData).map(([level, count]) => ({ level, count }));
+
+                const legendData = [
+                    { painLevel: 10, color: "#FF3333", text: "Insuportável" },
+                    { painLevel: 9, color: "#FF9999", text: "Muito extrema" },
+                    { painLevel: 8, color: "#FF9933", text: "Extrema" },
+                    { painLevel: 7, color: "#FFCC99", text: "Muito forte" },
+                    { painLevel: 6, color: "#FFFF33", text: "Muito intensa" },
+                    { painLevel: 5, color: "#FFFF99", text: "Intensa" },
+                    { painLevel: 4, color: "#33FF77", text: "Considerável" },
+                    { painLevel: 3, color: "#B3FFCC", text: "Moderada" },
+                    { painLevel: 2, color: "#66B3FF", text: "Leve" },
+                    { painLevel: 1, color: "#D6E9FF", text: "Muito leve " },
+                    { painLevel: 0, color: "#d9d6d6", text: "Nenhuma " },
+
+                ];
+
+                const colorScale = d3.scaleOrdinal()
+                    .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                    .range(['#FF3333', '#FF9999', '#FF9933', '#FFCC99', '#FFFF33', '#FFFF99', '#33FF77', '#B3FFCC', '#66B3FF', '#D6E9FF', '#cbe1fc'].reverse());
+
+                const width = 600;
+                const height = 300;
+                const radius = Math.min(width, height) / 2;
+
+                const pie = d3.pie()
+                    .value(d => d.count)
+                    .sort(null);
+
+                const arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+
+                const svg = d3.select('#pain-pie')
+                    .html('')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .append('g')
+                    .attr('transform', `translate(200, ${height / 2})`);
+
+
+                const arcs = svg.selectAll('arc')
+                    .data(pie(pieData))
+                    .enter()
+                    .append('g')
+                    .attr('class', 'arc');
+
+                arcs.append('path')
+                    .attr('d', arc)
+                    .attr('fill', d => colorScale(d.data.level))
+                    .attr('stroke', '#ffffff') // Cor do contorno dos slices
+                    .attr('stroke-width', 0.3); // Espessura do contorno dos slices
+
+                const legend = svg.append('g')
+                    .attr('transform', `translate(${radius + 20}, -${height / 3})`);
+
+                const colorLegend = legend.selectAll('.color-legend')
+                    .data(pieData.reverse())
+                    .enter()
+                    .append('g')
+                    .attr('class', 'color-legend')
+                    .attr('transform', (d, i) => `translate(0, ${i * 25})`); // Ajuste o valor de 25 para controlar o espaçamento vertical
+
+                colorLegend.append('rect')
+                    .attr('width', 10)
+                    .attr('height', 10)
+                    .attr('fill', d => colorScale(d.level));
+
+                colorLegend.append('text')
+                    .attr('x', 15)
+                    .attr('y', 10) // Ajuste o valor de 5 para posicionar verticalmente o texto corretamente
+                    .text(d => {
+                        //console.log(d.level)
+                        if (d.level == 10) return 'Insurportável';
+                        if (d.level == 9) return 'Muito extrema';
+                        if (d.level == 8) return 'Extrema';
+                        if (d.level == 7) return 'Muito forte';
+                        if (d.level == 6) return 'Muito intensa';
+                        if (d.level == 5) return 'Intensa';
+                        if (d.level == 4) return 'Considerável';
+                        if (d.level == 3) return 'Moderada';
+                        if (d.level == 2) return 'Leve';
+                        if (d.level == 1) return 'Muito leve';
+                        if (d.level == 0) return 'Nenhuma';
+                    });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        let sintomas_selecionados = [];
+        // Atualizar gráfico de treemap de sintomas
+        async function updateSymptomsTreemapChart(filtrado) {
+            try {
+                // Recupera os dados dos pacientes do MongoDB
+                const response = await fetch('/pacientes');
+                let patients = await response.json();
+                if (filtrado) patients = filteredData;
+                pacientes = patients;
+                console.log(pacientes)
+                const symptomsData = pacientes.reduce((data, patient) => {
+                    const patientSymptoms = patient.symptoms.split(","); // Divide os sintomas por vírgula
+                    patientSymptoms.forEach(symptom => {
+                        const cleanedSymptom = symptom.trim(); // Remove espaços em branco antes e depois do sintoma
+                        data[cleanedSymptom] = (data[cleanedSymptom] || 0) + 1;
+                    });
+                    return data;
+                }, {});
+
+                const treemapData = {
+                    name: 'Symptoms',
+                    children: Object.entries(symptomsData).map(([symptom, count]) => ({ name: symptom, count })),
+                };
+
+                const width = 450;
+                const height = 300;
+
+                const colorScale = d3.scaleOrdinal()
+                    .domain(treemapData.children.map(d => d.name))
+                    .range(d3.schemeCategory10);
+
+                const treemap = d3.treemap()
+                    .size([width, height])
+                    .padding(1)
+                    .round(true);
+
+                const root = d3.hierarchy(treemapData)
+                    .sum(d => d.count)
+                    .sort((a, b) => b.count - a.count);
+
+                treemap(root);
+
+                const svg = d3.select('#symptoms-treemap')
+                    .html('')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                const cell = svg.selectAll('g')
+                    .data(root.leaves())
+                    .enter()
+                    .append('g')
+                    .attr('transform', d => `translate(${d.x0}, ${d.y0})`)
+                    .on('click', handleClick); // Adiciona evento de clique
+
+                cell.append('rect')
+                    .attr('width', d => d.x1 - d.x0)
+                    .attr('height', d => d.y1 - d.y0)
+                    .attr('fill', d => colorScale(d.data.name));
+
+                cell.append('text')
+                    .attr('x', 5)
+                    .attr('y', 15)
+                    .text(d => d.data.name);
+
+                function handleClick() {
+                    // Alternar classe "selected" para o retângulo clicado
+                    d3.select(this).select('rect').classed('selected', !d3.select(this).select('rect').classed('selected'));
+                    const selectedSymptoms = Array.from(document.querySelectorAll('.selected')).map(el => el.__data__.data.name);
+                    console.log(selectedSymptoms)
+                    // Filtrar os dados com base nos sintomas selecionados
+                    const filteredDataBySymptoms = pacientes.filter(patient => selectedSymptoms.every(symptom => patient.symptoms.includes(symptom)));
+                    if (filteredDataBySymptoms.length) {
+                        filteredData = filteredDataBySymptoms;
+                        console.log("Filtrado :")
+                        console.log(filteredData)
+                    }
+                    else {
+                        filteredData = pacientes;
+                    }
+
+                    // Chamar as funções de atualização dos outros gráficos com os dados filtrados
+                    updateSatisfactionChart(1);
+                    updateAgeHistogramChart(1);
+                    updateGeneralInfo(1);
+                    updatePainPieChart(1);
+                    updatePatientList(1);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+
+
+
+        // Atualizar gráfico de histograma de faixa etária
+        async function updateAgeHistogramChart(filtrado) {
+            try {
+                const response = await fetch('/pacientes');
+                let data = await response.json();
+                let idades = data;
+                if (filtrado) data = filteredData;
+
+                const ageData = data.map(patient => patient.age);
+                idades = idades.map(patient => patient.age);
+                const width = 300;
+                const height = 300;
+                const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+                const histogramWidth = width - margin.left - margin.right;
+                const histogramHeight = height - margin.top - margin.bottom;
+
+                const x = d3.scaleLinear()
+                    .domain([10, 80])
+                    .range([0, histogramWidth]);
+
+                const bins = d3.histogram()
+                    .domain(x.domain())
+                    .thresholds(x.ticks(10))
+                    (ageData);
+
+                const y = d3.scaleLinear()
+                    .domain([0, idades.length])
+                    .range([histogramHeight, 0]);
+
+                const xAxis = d3.axisBottom(x);
+                const yAxis = d3.axisLeft(y);
+
+                const svg = d3.select('#age-histogram')
+                    .html('')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+                svg.append('g')
+                    .attr('class', 'x-axis')
+                    .attr('transform', `translate(0, ${histogramHeight})`)
+                    .call(xAxis);
+
+                svg.append('g')
+                    .attr('class', 'y-axis')
+                    .call(yAxis);
+
+                svg.append('text')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', 0 - margin.left)
+                    .attr('x', 0 - (histogramHeight / 2))
+                    .attr('dy', '1em')
+                    .style('text-anchor', 'middle')
+                    .text('Quantidade');
+
+                svg.append('text')
+                    .attr('y', histogramHeight + 20)
+                    .attr('x', (width / 3) + 20)
+                    .attr('dy', '1em')
+                    .style('text-anchor', 'middle')
+                    .text('Idades');
+
+                svg.selectAll('rect')
+                    .data(bins)
+                    .enter()
+                    .append('rect')
+                    .attr('x', 1)
+                    .attr('transform', d => `translate(${x(d.x0)}, ${y(d.length)})`)
+                    .attr('width', d => x(d.x1) - x(d.x0) - 1)
+                    .attr('height', d => histogramHeight - y(d.length))
+                    .attr('fill', 'steelblue');
+            } catch (error) {
+                console.error('Erro ao obter os dados dos pacientes:', error);
+            }
+        }
+
+        async function updateSatisfactionChart(filtrado) {
+            try {
+                const response = await fetch('/pacientes');
+                let data = await response.json();
+                let satisfacoes = data;
+                if (filtrado) data = filteredData;
+
+                const satisfactionData = data.map(patient => patient.satisfaction);
+                satisfacoes = satisfacoes.map(patient => patient.satisfaction);
+                const width = 300;
+                const height = 300;
+                const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+                const histogramWidth = width - margin.left - margin.right;
+                const histogramHeight = height - margin.top - margin.bottom;
+
+                const x = d3.scaleLinear()
+                    .domain([0, 10])
+                    .range([0, histogramWidth]);
+
+                const bins = d3.histogram()
+                    .domain(x.domain())
+                    .thresholds(x.ticks(10))
+                    (satisfactionData);
+
+                const y = d3.scaleLinear()
+                    .domain([0, satisfacoes.length])
+                    .range([histogramHeight, 0]);
+
+                const xAxis = d3.axisBottom(x);
+                const yAxis = d3.axisLeft(y);
+
+                const svg = d3.select('#satisfaction-histogram')
+                    .html('')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+                svg.append('g')
+                    .attr('class', 'x-axis')
+                    .attr('transform', `translate(0, ${histogramHeight})`)
+                    .call(xAxis);
+
+                svg.append('g')
+                    .attr('class', 'y-axis')
+                    .call(yAxis);
+
+                svg.append('text')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', 0 - margin.left)
+                    .attr('x', 0 - (histogramHeight / 2))
+                    .attr('dy', '1em')
+                    .style('text-anchor', 'middle')
+                    .text('Quantidade');
+
+                svg.append('text')
+                    .attr('y', histogramHeight + 20)
+                    .attr('x', (width / 3) + 20)
+                    .attr('dy', '1em')
+                    .style('text-anchor', 'middle')
+                    .text('Satisfações');
+
+                svg.selectAll('rect')
+                    .data(bins)
+                    .enter()
+                    .append('rect')
+                    .attr('x', 1)
+                    .attr('transform', d => `translate(${x(d.x0)}, ${y(d.length)})`)
+                    .attr('width', d => x(d.x1) - x(d.x0) - 1)
+                    .attr('height', d => histogramHeight - y(d.length))
+                    .attr('fill', 'steelblue');
+            } catch (error) {
+                console.error('Erro ao obter os dados dos pacientes:', error);
+            }
+        }
+
+
+
+
+
+        // Função para aplicar os filtros
+        async function applyFilters(filtrado) {
+            try {
+                const clinicFilter = document.getElementById('clinic-filter').value.toLowerCase();
+                const ageFilter = document.getElementById('age-filter').value;
+                const genderFilter = document.getElementById('gender-filter').value.toLowerCase();
+                console.log(clinicFilter, ageFilter, genderFilter)
+                const response = await fetch('/pacientes');
+                const patients = await response.json();
+
+                filteredData = patients.filter(patient =>
+                    (clinicFilter === '' || patient.clinic.toLowerCase() === clinicFilter) &&
+                    (ageFilter === '' || ageFilter === '20-30' && patient.age >= 20 && patient.age <= 30 ||
+                        ageFilter === '31-40' && patient.age >= 31 && patient.age <= 40 ||
+                        ageFilter === '41-50' && patient.age >= 41 && patient.age <= 50 ||
+                        ageFilter === '51-60' && patient.age >= 51 && patient.age <= 60) &&
+                    (genderFilter === '' || patient.gender.toLowerCase() === genderFilter)
+                );
+                console.log(filteredData)
+
+                updateGeneralInfo(1);
+                updatePainPieChart(1);
+                updateSymptomsTreemapChart(1);
+                updateAgeHistogramChart(1);
+                updateSatisfactionChart(1);
+                updatePatientList(1);
+            } catch (error) {
+                console.error('An error occurred while applying filters:', error);
+            }
+        }
+
+
+        async function resetFilters() {
+            try {
+                document.getElementById('clinic-filter').value = '';
+                document.getElementById('age-filter').value = '';
+                document.getElementById('gender-filter').value = '';
+
+                const response = await fetch('/pacientes');
+                const patients = await response.json();
+                filteredData = patients;
+
+                updateGeneralInfo();
+                updatePainPieChart();
+                updateSymptomsTreemapChart();
+                updateAgeHistogramChart();
+                updateSatisfactionChart();
+                updatePatientList();
+            } catch (error) {
+                console.error('An error occurred while resetting filters:', error);
+            }
+        }
+
+
+
+        // Inicializar gráficos
+        updateGeneralInfo();
+        updatePainPieChart();
+        updateSymptomsTreemapChart();
+        updateAgeHistogramChart();
+        updateSatisfactionChart();
+
+    </script>
+</body>
+
+</html>

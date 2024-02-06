@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-container select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-container textarea {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            display: none;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Adicionar Paciente</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="form-container">
+        <h2>Adicionar Paciente</h2>
+
+        <form id="pacienteForm" enctype="multipart/form-data">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" required>
+
+            <label for="age">Idade:</label>
+            <input type="number" id="age" required>
+
+            <label for="gender">Gênero:</label>
+            <select id="gender" required>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
+            </select>
+
+            <label for="clinic">Clínica:</label>
+            <input type="text" id="clinic" required>
+
+            <label for="symptoms">Sintomas (separados por vírgula):</label>
+            <input type="text" id="symptoms" required>
+
+            <label for="rehabTime">Tempo de Reabilitação (em semanas):</label>
+            <input type="number" id="rehabTime" required>
+
+            <label for="satisfaction">Satisfação (de 1 a 10):</label>
+            <input type="number" id="satisfaction" min="1" max="10" required>
+
+            <label for="notes">Anotações:</label>
+            <input type="text" id="notes">
+
+            <label for="sessions">Sessões:</label>
+            <input type="file" id="sessions" multiple accept=".xls, .xlsx">
+
+            <input type="submit" value="Adicionar Paciente">
+        </form>
+    </div>
+
+    <div id="popupSuccess" class="popup" style="background-color: #e1f3d8; color: #3d8b32;">
+        Paciente adicionado com sucesso!
+    </div>
+
+    <div id="popupError" class="popup" style="background-color: #f8d7da; color: #721c24;">
+        Erro ao adicionar o paciente. Por favor, tente novamente.
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+
+    <script>
+        // Função para exibir o pop-up de sucesso
+        function showSuccessPopup() {
+            const popup = document.getElementById('popupSuccess');
+            popup.style.display = 'block';
+
+            setTimeout(function () {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+
+        // Função para exibir o pop-up de erro
+        function showErrorPopup() {
+            const popup = document.getElementById('popupError');
+            popup.style.display = 'block';
+
+            setTimeout(function () {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+
+        // Obtém o elemento do campo de seleção de arquivos
+        const fileInput = document.getElementById('sessions');
+        const nextPainLevelInput = fileInput.nextElementSibling;
+
+        const painLevelOptions = [
+                    { value: 10, label: 'Insuportável' },
+                    { value: 9, label: 'Muito extrema' },
+                    { value: 8, label: 'Extrema' },
+                    { value: 7, label: 'Muito forte' },
+                    { value: 6, label: 'Muito intensa' },
+                    { value: 5, label: 'Intensa' },
+                    { value: 4, label: 'Considerável' },
+                    { value: 3, label: 'Moderada' },
+                    { value: 2, label: 'Leve' },
+                    { value: 1, label: 'Muito leve' },
+                    { value: 0, label: 'Nenhuma' }
+                ];
+
+        // Manipula o evento de alteração do campo de seleção de arquivos
+        fileInput.addEventListener('change', function () {
+            // Obtém o número de arquivos selecionados
+            const numFiles = fileInput.files.length;
+
+            // Remove os campos de seleção de nível de dor existentes (se houver)
+            const existingPainLevelInputs = document.getElementsByClassName('pain-level-input');
+            while (existingPainLevelInputs.length > 0) {
+                existingPainLevelInputs[0].parentNode.removeChild(existingPainLevelInputs[0]);
+
+            }
+
+            // Percorre cada arquivo selecionado
+            for (let i = 0; i < numFiles; i++) {
+                const file = fileInput.files[i];
+
+                // Cria um novo elemento de seleção de nível de dor
+                const painLevelLabel = document.createElement('label');
+                painLevelLabel.textContent = `Nível de Dor para o Arquivo ${i + 1}:`;
+
+                const painLevelSelect = document.createElement('select');
+                painLevelSelect.required = true;
+                painLevelSelect.classList.add('pain-level-input');
+                painLevelSelect.id = `painLevelInput_${i}`;
+
+                // Adiciona as opções de nível de dor ao select
+                for (const option of painLevelOptions) {
+                    const painLevelOption = document.createElement('option');
+                    painLevelOption.value = option.value;
+                    painLevelOption.text = option.label;
+                    painLevelSelect.appendChild(painLevelOption);
+                }
+
+                painLevelLabel.classList.add('pain-level-input');
+
+                if (nextPainLevelInput) {
+                    fileInput.parentNode.insertBefore(painLevelLabel, nextPainLevelInput);
+                    fileInput.parentNode.insertBefore(painLevelSelect, nextPainLevelInput);
+                } else {
+                    fileInput.parentNode.appendChild(painLevelLabel);
+                    fileInput.parentNode.appendChild(painLevelSelect);
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('pacienteForm');
+            const successPopup = document.getElementById('popupSuccess');
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const files = document.getElementById('sessions').files;
+
+                const paciente = {
+                    name: document.getElementById('name').value,
+                    age: parseInt(document.getElementById('age').value),
+                    gender: document.getElementById('gender').value,
+                    clinic: document.getElementById('clinic').value,
+                    painLevel: parseInt(document.getElementById('painLevelInput_' + (files.length - 1)).value),
+                    symptoms: document.getElementById('symptoms').value,
+                    notes: document.getElementById('notes').value,
+                    numSessoes: files.length,
+                    rehabTime: parseInt(document.getElementById('rehabTime').value),
+                    satisfaction: parseInt(document.getElementById('satisfaction').value),
+                    sessions: []
+                };
+
+                const readerPromises = [];
+                const movements = ['Flexão de Cotovelo', 'Extensão de Cotovelo', 'Flexão e Extensão de Joelho','Flexão e Extensão da Coluna','Inclinação Lateral da Coluna'];
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    readerPromises.push(new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+
+                        reader.onload = () => {
+                            const workbook = XLSX.read(reader.result, { type: 'binary' });
+                            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                            const session = {
+                                sessionNumber: i + 1,
+                                movements: [],
+                                painLevel: parseInt(document.getElementById('painLevelInput_' + i).value),
+                            };
+                            console.log(data)
+                            //GAMBIARRA PARA TER VÁRIOS MOVIMENTOS EM UMA SESSÃO, SENDO QUE O QUE DETERMINA O QUE O PACIENTE ESTÁ FAZENDO SERIA O PROJETO DO LUIS GUILHERME
+                            const columns = data[0];
+                            const numMovements = Math.floor(Math.random() * 5) + 1; // Gera de 1 a 5 movimentos aleatórios
+                            for (let z = 0; z < numMovements; z++) {
+                                let randomIndex = Math.floor(Math.random() * movements.length);
+                                let movement = movements[randomIndex];
+                                let movementData = {
+                                    movimento: movement,
+                                    data: []
+                                };
+                                let frames = [];
+
+                                for (let j = Math.floor((data.length / numMovements) * z) + 1; j < Math.floor((data.length / numMovements) * (z + 1) - 1); j++) {
+                                    let rowData = data[j];
+                                    //console.log(rowData)
+                                    let dados = {};
+                                    //console.log(columns);
+                                    for (let k = 0; k < columns.length; k++) {
+                                        let columnName = columns[k];
+                                        let columnValue = rowData[k];
+                                        dados[columnName] = columnValue;
+                                    }
+
+                                    frames.push(dados);
+                                }
+
+                                movementData.data.push(frames);
+                                session.movements.push(movementData);
+                            }
+
+
+
+                            paciente.sessions.push(session);
+
+                            resolve();
+                        };
+
+                        reader.onerror = () => {
+                            reject(new Error('Erro ao ler o arquivo'));
+                        };
+
+                        reader.readAsBinaryString(file);
+                    }));
+                }
+
+                Promise.all(readerPromises)
+                    .then(() => {
+                        console.log(paciente);
+                        axios.post('http://localhost:3000/adicionar-paciente', paciente)
+                            .then(function (response) {
+                                console.log(response);
+                                return new Promise((resolve) => {
+                                    showSuccessPopup();
+                                    setTimeout(resolve, 3000); // Aguardar 3 segundos (3000 milissegundos) antes de resolver a Promise
+                                });
+                            })
+                            .then(() => {
+                                // Abrir o Swal.fire() após a conclusão da função showSuccessPopup()
+                                Swal.fire({
+                                    title: "Deseja adicionar mais um paciente?",
+                                    icon: "question",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#3085d6",
+                                    cancelButtonColor: "#d33",
+                                    confirmButtonText: "Sim",
+                                    cancelButtonText: "Não"
+                                }).then((result) => {
+                                    console.log(result)
+                                    if (result.isConfirmed) {
+                                        form.reset();
+                                        const existingPainLevelInputs = document.getElementsByClassName('pain-level-input');
+                                        while (existingPainLevelInputs.length > 0) {
+                                            existingPainLevelInputs[0].parentNode.removeChild(existingPainLevelInputs[0]);
+                                        }
+                                    } else if (result.isDismissed) {
+                                        window.close();
+                                    }
+                                });
+                            })
+                            .catch(function (error) {
+                                showErrorPopup();
+                            });
+
+                        // Aqui você pode fazer a requisição HTTP para enviar os dados para o servidor
+
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+        });
+
+        window.addEventListener('beforeunload', function () {
+            if (window.opener && typeof window.opener.executarAposFechar === 'function') {
+                window.opener.executarAposFechar();
+            }
+        });
+
+    </script>
+
+
+
+</body>
+
+</html>
